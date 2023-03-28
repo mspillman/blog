@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mspillman.github.io/blog/about.html</loc>
-    <lastmod>2023-03-28T21:29:13.384Z</lastmod>
+    <loc>blog/about.html</loc>
+    <lastmod>2023-03-28T21:41:30.937Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/index.html</loc>
-    <lastmod>2023-03-28T21:29:14.149Z</lastmod>
+    <loc>blog/index.html</loc>
+    <lastmod>2023-03-28T21:41:32.224Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2021-10-30-introduction-to-gallop.html</loc>
-    <lastmod>2023-03-28T21:29:15.271Z</lastmod>
+    <loc>blog/posts/2021-10-30-introduction-to-gallop.html</loc>
+    <lastmod>2023-03-28T21:41:33.323Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2021-11-02-solving-structures-with-gallop-browser-interface.html</loc>
-    <lastmod>2023-03-28T21:29:15.728Z</lastmod>
+    <loc>blog/posts/2021-11-02-solving-structures-with-gallop-browser-interface.html</loc>
+    <lastmod>2023-03-28T21:41:33.767Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2021-11-03-solving-structures-with-gallop-python-api.html</loc>
-    <lastmod>2023-03-28T21:29:18.000Z</lastmod>
+    <loc>blog/posts/2021-11-03-solving-structures-with-gallop-python-api.html</loc>
+    <lastmod>2023-03-28T21:41:36.036Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2021-11-07-slices-of-hypersurfaces.html</loc>
-    <lastmod>2023-03-28T21:29:20.134Z</lastmod>
+    <loc>blog/posts/2021-11-07-slices-of-hypersurfaces.html</loc>
+    <lastmod>2023-03-28T21:41:38.168Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2021-11-10-hofcalc.html</loc>
-    <lastmod>2023-03-28T21:29:20.798Z</lastmod>
+    <loc>blog/posts/2021-11-10-hofcalc.html</loc>
+    <lastmod>2023-03-28T21:41:38.849Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2021-11-18-google-cloud.html</loc>
-    <lastmod>2023-03-28T21:29:21.193Z</lastmod>
+    <loc>blog/posts/2021-11-18-google-cloud.html</loc>
+    <lastmod>2023-03-28T21:41:39.246Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2022-01-08-profile-chi-squared-optimisation.html</loc>
-    <lastmod>2023-03-28T21:29:21.756Z</lastmod>
+    <loc>blog/posts/2022-01-08-profile-chi-squared-optimisation.html</loc>
+    <lastmod>2023-03-28T21:41:39.807Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2022-05-30-restraints-for-rings-and-stereochemistry.html</loc>
-    <lastmod>2023-03-28T21:29:22.552Z</lastmod>
+    <loc>blog/posts/2022-05-30-restraints-for-rings-and-stereochemistry.html</loc>
+    <lastmod>2023-03-28T21:41:40.620Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/posts/2023-01-23-profile-chi-squared-when-dash-pawley-fails.html</loc>
-    <lastmod>2023-03-28T21:29:22.878Z</lastmod>
+    <loc>blog/posts/2023-01-23-profile-chi-squared-when-dash-pawley-fails.html</loc>
+    <lastmod>2023-03-28T21:41:40.950Z</lastmod>
   </url>
   <url>
-    <loc>https://mspillman.github.io/blog/publications.html</loc>
-    <lastmod>2023-03-28T21:29:23.134Z</lastmod>
+    <loc>blog/publications.html</loc>
+    <lastmod>2023-03-28T21:41:41.222Z</lastmod>
   </url>
 </urlset>
