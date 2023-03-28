@@ -2,50 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>blog/about.html</loc>
-    <lastmod>2023-03-28T21:41:30.937Z</lastmod>
+    <lastmod>2023-03-28T21:42:35.480Z</lastmod>
   </url>
   <url>
     <loc>blog/index.html</loc>
-    <lastmod>2023-03-28T21:41:32.224Z</lastmod>
+    <lastmod>2023-03-28T21:42:36.234Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2021-10-30-introduction-to-gallop.html</loc>
-    <lastmod>2023-03-28T21:41:33.323Z</lastmod>
+    <lastmod>2023-03-28T21:42:37.354Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2021-11-02-solving-structures-with-gallop-browser-interface.html</loc>
-    <lastmod>2023-03-28T21:41:33.767Z</lastmod>
+    <lastmod>2023-03-28T21:42:37.805Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2021-11-03-solving-structures-with-gallop-python-api.html</loc>
-    <lastmod>2023-03-28T21:41:36.036Z</lastmod>
+    <lastmod>2023-03-28T21:42:40.090Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2021-11-07-slices-of-hypersurfaces.html</loc>
-    <lastmod>2023-03-28T21:41:38.168Z</lastmod>
+    <lastmod>2023-03-28T21:42:42.223Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2021-11-10-hofcalc.html</loc>
-    <lastmod>2023-03-28T21:41:38.849Z</lastmod>
+    <lastmod>2023-03-28T21:42:42.895Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2021-11-18-google-cloud.html</loc>
-    <lastmod>2023-03-28T21:41:39.246Z</lastmod>
+    <lastmod>2023-03-28T21:42:43.290Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2022-01-08-profile-chi-squared-optimisation.html</loc>
-    <lastmod>2023-03-28T21:41:39.807Z</lastmod>
+    <lastmod>2023-03-28T21:42:43.863Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2022-05-30-restraints-for-rings-and-stereochemistry.html</loc>
-    <lastmod>2023-03-28T21:41:40.620Z</lastmod>
+    <lastmod>2023-03-28T21:42:44.671Z</lastmod>
   </url>
   <url>
     <loc>blog/posts/2023-01-23-profile-chi-squared-when-dash-pawley-fails.html</loc>
-    <lastmod>2023-03-28T21:41:40.950Z</lastmod>
+    <lastmod>2023-03-28T21:42:45.002Z</lastmod>
   </url>
   <url>
     <loc>blog/publications.html</loc>
-    <lastmod>2023-03-28T21:41:41.222Z</lastmod>
+    <lastmod>2023-03-28T21:42:45.264Z</lastmod>
   </url>
 </urlset>
