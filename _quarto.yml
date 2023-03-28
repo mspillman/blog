@@ -3,7 +3,6 @@ project:
 
 website:
   title: "Mark Spillman"
-  site-url: blog
   google-analytics: G-EVMREB130B
   navbar:
     right:
