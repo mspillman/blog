@@ -256,7 +256,14 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </ul>
 <section id="filtering-powcod-data" class="level2">
 <h2 class="anchored" data-anchor-id="filtering-powcod-data">Filtering PowCod data</h2>
-<p>The PowCod database, which can be obtained <a href="https://www.ba.ic.cnr.it/softwareic/qualx/powcod-download/">here</a>, is made up of several .sql files which need to be parsed to extract the desired information. In our case, what we are after is: - Unit cells - Crystal systems - Space groups - Miller indices - Intensities</p>
+<p>The PowCod database, which can be obtained <a href="https://www.ba.ic.cnr.it/softwareic/qualx/powcod-download/">here</a>, is made up of several .sql files which need to be parsed to extract the desired information. In our case, what we are after is:</p>
+<ul>
+<li>Unit cells</li>
+<li>Crystal systems</li>
+<li>Space groups</li>
+<li>Miller indices</li>
+<li>Intensities</li>
+</ul>
 <p>We’ll probably also need to use some additional information to help us along the way, for example, the d-spacing of the reflections.</p>
 <p>As the files total only around 5.5 GB, I used pandas to read the database into memory and extract the information needed. I pickled the resultant dataframe to enable it to be more easily read in the future.</p>
 <div class="cell" data-execution_count="4">
@@ -687,8 +694,8 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <p><img src="2023-09-08-Generating-synthetic-PXRD-data_files/figure-html/cell-5-output-1.png" class="quarto-discovered-preview-image img-fluid"></p>
 </div>
 </div>
-<p>We’re starting off with 458k samples, but a lot of these won’t be useful for us. I’m choosing to focus on typical small molecule crystal structures, and attempting to generate realistic looking <em>laboratory</em> diffraction data.</p>
-<p>From what we’ve seen so far, we can see that some unit cells are listed as having zero volume, and have a value of 0 for the unit cell lengths and angles. Our goal of modifying unit cells and using them to generate the diffraction data means that these entries are not useful to us, so we’ll need to remove them. We can also see that there are some monstrous unit cells in there, with volumes of &gt;700,000 Å³!</p>
+<p>We’re starting off with 458k samples, but a lot of these won’t be useful for us. I’m choosing to focus on materials with relatively small unit cells, and attempting to generate realistic looking <em>laboratory</em> diffraction data.</p>
+<p>We can see that some unit cells are listed as having zero volume, and have a value of 0 for the unit cell lengths and angles. Our goal of modifying unit cells and using them to generate the diffraction data as a form of data augmentation means that these entries are not useful to us, so we’ll need to remove them. We can also see that there are some monstrous unit cells in there, with volumes of &gt;700,000 Å³!</p>
 <p>To make things manageable for future machine learning projects, we’re going to set limits on the allowable unit cell dimensions and volumes. Let’s set the lower and upper limits for volume to 400 and 4000 Å³ respectively, and set the maximum unit cell length to 50 Å. We can also see some unusual looking unit cell angles, so I’m going to trim entries with cell angles below 60 and above 120 degrees (keeping 120 degrees is important to ensure we keep hexagonal unit cells).</p>
 <p>Eventually, we’re going to generate diffraction data. I’ve chosen to focus on realistic looking laboratory diffraction data, and hence I’m choosing to work in the (arbirarily chosen!) range 4 - 44 ° <span class="math inline">\(2\theta\)</span> with Cu K-α1 radiation. We’ll want to ensure that there are at least a few easily detectable peaks within this chosen range. I’ll set the lower bound for this as 10.</p>
 <div class="cell" data-execution_count="8">
@@ -839,7 +846,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </div>
 </div>
 </div>
-<p>That’s a fairly significant reduction in the number of samples, down by over 100k! However, hopefully we’ve gotten rid of most of the really odd or unusable samples in the dataset.</p>
+<p>That’s a fairly significant reduction in the number of samples - the size of the dataset has gone down by over 100k! However, hopefully we’ve now gotten rid of most of the really odd or unusable samples in the dataset, and the remaining filtering won’t have such a drastic effect on the remaining entries.</p>
 <p>Let’s now replot the kernel density plots we saw earlier and see how things look after the filtering.</p>
 <div class="cell" data-execution_count="10">
 <details>
@@ -919,7 +926,7 @@ Name: sg_number, dtype: float64</code></pre>
 </section>
 <section id="diffraction-data" class="level3">
 <h3 class="anchored" data-anchor-id="diffraction-data">Diffraction data</h3>
-<p>We can now turn our attention to the diffraction data - the intensities, Miller indices and d-spacings. Some of the entries will have a huge number of peaks, some will have very few. To start with, I’m choosing to exclude samples that have reflections <em>below</em> the bottom of our data range. I also want to ensure that there are still a few peaks <em>above</em> the top end of our data range which ensures that we aren’t missing any data <em>inside</em> our chosen data range.</p>
+<p>We can now turn our attention to the diffraction data - the intensities, Miller indices and d-spacings. Some of the entries will have a huge number of peaks, some will have very few. To start with, I’m choosing to exclude samples that have reflections <em>below</em> the bottom of our data range. I also want to ensure that there is still at least one peak <em>above</em> the top end of our data range which ensures that we aren’t missing any data <em>inside</em> our chosen data range.</p>
 <p>Our dataframe contains the d-spacings for the observed reflections, so using Bragg’s law we can easily convert the angular range bounds into d-spacings, and then apply the filtering just described.</p>
 <div class="cell" data-execution_count="11">
 <details>
@@ -1116,7 +1123,7 @@ Maximum angle = 44 : Minimum d-spacing = 2.056</code></pre>
 Name: intensita, Length: 294047, dtype: object</code></pre>
 </div>
 </div>
-<p>Intensities are stored as a string, which has comma separated values. Each pattern is scaled to give a maximum intensity of 1000. We should ensure that in our chosen data range, the intensities that are present are actually strong enough to be observed! Let’s say we want the minimum intensity in our data range to be 0.5 % of the maximum intensity. As such, we should have at least <span class="math inline">\(N\)</span> intensities in our range with a value greater than 5. As discussed earlier, I’ve chosen to set <span class="math inline">\(N = 10\)</span>.</p>
+<p>Intensities are stored as a string of comma separated values, with each pattern scaled to a maximum intensity of 1000. Next we should ensure that in our chosen data range, the intensities that are present are actually strong enough to be observed. Let’s say we want the minimum intensity in our data range to be 0.5 % of the maximum intensity. As such, there should have at least <span class="math inline">\(N\)</span> intensities in our range with a value greater than 5. As discussed earlier, I’ve chosen to set <span class="math inline">\(N = 10\)</span>.</p>
 <div class="cell" data-execution_count="15">
 <details>
 <summary>Show the code</summary>
@@ -1143,7 +1150,7 @@ max         386.000000
 Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 </div>
 </div>
-<p>As we can see, some of the patterns we might generate would have very few or no easily detectable peaks in our chosen data range. As our final filtering step, we’ll get rid of these entries which should give us our final filtered dataset.</p>
+<p>As we can see, some of the patterns we might generate would have very few or no easily detectable peaks in our chosen data range. As our final filtering step, we’ll get rid of them, leaving us with our final filtered dataset.</p>
 <div class="cell" data-execution_count="16">
 <details>
 <summary>Show the code</summary>
@@ -1383,7 +1390,7 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 <p>where <span class="math inline">\(X_{nn}\)</span> are elements of the reciprocal space metric tensor.</p>
 <p>This means that we will need a function to convert the unit cell dimensions into a matrix representation of the unit cell, invert this to determine the reciprocal lattice matrix and from this obtain the reciprocal lattice metric tensor. Once we have the reciprocal lattice metric tensor, we can calculate the d-spacings quite easily by multiplying with the Miller index array(s). However, one complication is that we want to do this for several samples simultaneously, so need to consider the shapes of our arrays.</p>
 <p>Before dealing with that, let’s write a function to simulate the effect of temperature changes, by adding a small amount of Gaussian noise to the unit cell dimensions. We will have to consider the crystal system symmetry here in order to ensure that, for example a cubic unit cell, the perturbation to lengths <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> is equal to the pertubation to <span class="math inline">\(a\)</span>. The standard deviation of the random noise to be added is going to be set to a default value of 0.05, meaning that the majority of perturbed unit cells should have edges with lengths +/- 0.15 Å from the database values, and angles +/- 0.15 ° (assuming they are allowed to vary by symmetry). This seems reasonable, and should allow us to assume that the fractional coordinates within the unit cells are unaffected, so we don’t need to worry about the effect on the relative intensities.</p>
-<div class="cell" data-execution_count="2">
+<div class="cell" data-execution_count="14">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
@@ -1436,7 +1443,7 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 <p>Let’s check it does what it’s meant to!</p>
 <p>What we’re expecting is that for the unit cell lengths, the perturbation should be the same for each of the edges for cubic and rhombohedral cells, and the perturbation for <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> should be the same for hexagonal and tetragonal cells.</p>
 <p>With regards to angles, where the original unit cell is an angle of 90 or 120 degrees, the perturbation should be zero. So we should see a change in the beta value for monoclinic cells, a change for all values of the triclinic unit cells and the same change for each of the angles for rhombohedral cells.</p>
-<div class="cell" data-execution_count="2">
+<div class="cell" data-execution_count="15">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>cs_key <span class="op">=</span>  {</span>
@@ -1459,35 +1466,35 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 <span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(name, <span class="st">"Angle perturbation:"</span>, angles,<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Cubic Length perturbation: tensor([[-0.0266, -0.0266, -0.0266]])
+<pre><code>Cubic Length perturbation: tensor([[0.0120, 0.0120, 0.0120]])
 Cubic Angle perturbation: tensor([[0., 0., 0.]]) 
 
-Hexagonal Length perturbation: tensor([[-0.0088, -0.0088,  0.0375]])
+Hexagonal Length perturbation: tensor([[0.0535, 0.0535, 0.0225]])
 Hexagonal Angle perturbation: tensor([[0., 0., 0.]]) 
 
-Monoclinic Length perturbation: tensor([[ 0.0049, -0.0555,  0.0063]])
-Monoclinic Angle perturbation: tensor([[0.0000, 0.0258, 0.0000]]) 
+Monoclinic Length perturbation: tensor([[-0.0509,  0.0907, -0.0980]])
+Monoclinic Angle perturbation: tensor([[0.0000, 0.0176, 0.0000]]) 
 
-Orthorhombic Length perturbation: tensor([[-0.0652, -0.0148, -0.0104]])
+Orthorhombic Length perturbation: tensor([[-0.0788, -0.0403, -0.0860]])
 Orthorhombic Angle perturbation: tensor([[0., 0., 0.]]) 
 
-Tetragonal Length perturbation: tensor([[-0.0055, -0.0055,  0.0428]])
+Tetragonal Length perturbation: tensor([[-0.0156, -0.0156, -0.0144]])
 Tetragonal Angle perturbation: tensor([[0., 0., 0.]]) 
 
-Triclinic Length perturbation: tensor([[-0.0521, -0.0112,  0.0643]])
-Triclinic Angle perturbation: tensor([[ 0.0202, -0.0083,  0.0039]]) 
+Triclinic Length perturbation: tensor([[-0.0154, -0.0387,  0.0159]])
+Triclinic Angle perturbation: tensor([[ 0.0273, -0.0582, -0.0836]]) 
 
-Trigonal (hexagonal axes) Length perturbation: tensor([[0.0370, 0.0370, 0.0156]])
+Trigonal (hexagonal axes) Length perturbation: tensor([[-0.0063, -0.0063,  0.0845]])
 Trigonal (hexagonal axes) Angle perturbation: tensor([[0., 0., 0.]]) 
 
-Trigonal (rhombohedral axes) Length perturbation: tensor([[-0.0299, -0.0299, -0.0299]])
-Trigonal (rhombohedral axes) Angle perturbation: tensor([[0.0540, 0.0540, 0.0540]]) 
+Trigonal (rhombohedral axes) Length perturbation: tensor([[-0.0002, -0.0002, -0.0002]])
+Trigonal (rhombohedral axes) Angle perturbation: tensor([[-0.0607, -0.0607, -0.0607]]) 
 </code></pre>
 </div>
 </div>
 <p>Looks good to me. We now need to start writing functions to generate our lattice matrix, reciprocal lattice matrix and reciprocal lattice metric tensor. We can then use these in conjunction with the Miller indices to determine the reflection d-spacings.</p>
 <p>Given that we are modifying unit cells, it’s probably sensible to check that the perturbed unit cells are valid. We can do that by calculating the volume of the unit cells, with invalid unit cells returning a volume of zero.</p>
-<div class="cell" data-execution_count="3">
+<div class="cell" data-execution_count="16">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_lattice_matrix(unit_cell_dimensions):</span>
@@ -1528,7 +1535,7 @@ Trigonal (rhombohedral axes) Angle perturbation: tensor([[0.0540, 0.0540, 0.0540
 </details>
 </div>
 <p>Let’s quickly check that this works as expected. I’ll give it a simple cubic unit cell, and an invalid unit cell.</p>
-<div class="cell" data-execution_count="4">
+<div class="cell" data-execution_count="17">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>cubic_cell <span class="op">=</span> torch.tensor([<span class="fl">5.0</span>, <span class="fl">5.0</span>, <span class="fl">5.0</span>, <span class="fl">90.0</span>, <span class="fl">90.0</span>, <span class="fl">90.0</span>]).unsqueeze(<span class="dv">0</span>)</span>
@@ -1543,7 +1550,7 @@ Invalid cell valid - False</code></pre>
 </div>
 <p>The last couple of functions we need to implement then include a way to get the reciprocal lattice metric tensor. The reciprocal lattice matrix can be easily obtained by inverting the lattice matrix we calculated previously.</p>
 <p>We also need a way to obtain the reflection d-spacings, and then lastly convert the d-spacings to <span class="math inline">\(2\theta\)</span>.</p>
-<div class="cell" data-execution_count="5">
+<div class="cell" data-execution_count="18">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_recip_lattice_metric_tensor(recip_lattice_matrix):</span>
@@ -1618,7 +1625,7 @@ Invalid cell valid - False</code></pre>
 </details>
 </div>
 <p>To test the whole set of functions written so far, I’ll add a convenience function to calculate the peak positions from the unit cells and Miller indices.</p>
-<div class="cell" data-execution_count="6">
+<div class="cell" data-execution_count="19">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_peak_positions(unit_cells, hkl, zpe<span class="op">=</span><span class="va">True</span>, wavelength<span class="op">=</span><span class="fl">1.54056</span>):</span>
@@ -1672,7 +1679,7 @@ Invalid cell valid - False</code></pre>
 <p><span class="math inline">\(a\)</span> = 23.573194, <span class="math inline">\(b\)</span> = 23.363375, <span class="math inline">\(c\)</span> = 5.125218</p>
 <p><span class="math inline">\(\alpha\)</span> = 90.000, <span class="math inline">\(\beta\)</span> = 88.77132, <span class="math inline">\(\gamma\)</span> = 90.000</p>
 <p>We’ll run the function both with and without zero point errors applied.</p>
-<div class="cell" data-execution_count="7">
+<div class="cell" data-execution_count="20">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>coXtal_unit_cell <span class="op">=</span> torch.tensor([<span class="fl">23.573194</span>, <span class="fl">23.363375</span>, <span class="fl">5.125218</span>, <span class="fl">90.000</span>, <span class="fl">88.77132</span>, <span class="fl">90.000</span>])</span>
@@ -1704,15 +1711,15 @@ ZPE: True
 </code></pre>
 </div>
 </div>
-<p>That looks like it’s working nicely!</p>
+<p>That looks like it’s working nicely - without a zero point error, the peak positions match, whilst with an error, the peak positions are all shifted by a consistent amount.</p>
 </section>
 <section id="peak-intensities" class="level2">
 <h2 class="anchored" data-anchor-id="peak-intensities">Peak intensities</h2>
 <p>The main contribution to the intensity of a diffraction peak is the position of the atoms within the unit cell. What makes the PowCod database so helpful is that this has already been calculated, and can be read in from the intensities array we saved earlier.</p>
 <p>However, there are experimental/physical effects that can modulate these intensities. Most import is the effect of preferred orientation. There are several ways to model this, I’m choosing to implement the <a href="https://scripts.iucr.org/cgi-bin/paper?a26366">March-Dollase</a> method as I already have some code written to do this in <em>GALLOP</em>. This code is actually based on code from GSAS-II; see the <code>GetPrefOri</code> function in the file found <a href="https://subversion.xray.aps.anl.gov/pyGSAS/trunk/GSASIIstrMath.py">here</a>. I updated it to use pytorch, and work over a batch of multiple PXRD patterns.</p>
-<p>Again, this is being implemented as a form of data augmentation, allowing our existing data to generate multiple different, but plausible, diffraction patterns.</p>
+<p>Again, this is being implemented as a form of data augmentation, allowing our existing data to generate multiple different, but plausible, diffraction patterns. As such, the preferred orientation axis is limited to being in the [1,0,0], [0,1,0] or [0,0,1] directions.</p>
 <p>Future work could extend this to use the more sophisticated spherical harmonic approach described <a href="http://scripts.iucr.org/cgi-bin/paper?S0021889897005918">here</a>.</p>
-<div class="cell" data-execution_count="8">
+<div class="cell" data-execution_count="21">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_MD_PO_components(hkl, reciprocal_lattice_metric_tensor, dspacing, factor_std<span class="op">=</span><span class="fl">0.1</span>):</span>
@@ -1791,7 +1798,7 @@ ZPE: True
 <p>Now that we can calculate where the peaks will be, and modulate the intensity of the peaks if we want to, we now need to think about the shape of the peaks.</p>
 <p>There are several possible peak shapes that we could go for, however, in order to try to get relatively realistic results, I decided to implement full Voigt functions, and also include the <a href="https://scripts.iucr.org/cgi-bin/paper?hn0025">Finger, Cox and Jephcoat</a> correction for peak asymmetry due to axial divergence. I also decided to implement peak broadening as a function of the peak position, using the well established U,V,W,X,Y,Z parameters described <a href="https://journals.iucr.org/j/issues/2021/06/00/gj5272/">here</a> and elsewhere.</p>
 <p>We therefore need to calculate gaussian, lorentzian and the FCJ profile for each peak in the data, then convolve them together. Using the <a href="https://en.wikipedia.org/wiki/Convolution_theorem">convolution theorem</a>, we can do this by first Fourier transforming them, calculating their pointwise product in Fourier space, then inverse Fourier transforming the resultant product.</p>
-<div class="cell" data-execution_count="9">
+<div class="cell" data-execution_count="22">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gaussian(x, mu, sig):</span>
@@ -1974,7 +1981,7 @@ ZPE: True
 <section id="background-and-noise" class="level2">
 <h2 class="anchored" data-anchor-id="background-and-noise">Background and noise</h2>
 <p>The experimental noise can be modelled as gaussian noise, which we can add very easily to the calculated diffraction data. For the background shape, we can use <a href="https://en.wikipedia.org/wiki/Chebyshev_polynomials">Chebyshev polynomials</a>.</p>
-<div class="cell" data-execution_count="24">
+<div class="cell" data-execution_count="23">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_noise(calculated_patterns, noise_min <span class="op">=</span> <span class="fl">0.0001</span>, noise_max <span class="op">=</span> <span class="fl">0.0025</span>):</span>
@@ -2055,7 +2062,7 @@ ZPE: True
 <p><img src="2023-09-08-Generating-synthetic-PXRD-data_files/figure-html/cell-30-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Some funky background shapes are possible with randomly generated Chebyshev polynomials! However, these look reasonable to me.</p>
+<p>Some funky background shapes are possible with randomly generated Chebyshev polynomials! We can also see varying levels of noise being added to the profiles.</p>
 <p>We now need functions to tie everything together and start to generate some data</p>
 <div class="cell" data-execution_count="26">
 <details>
@@ -2196,7 +2203,7 @@ ZPE: True
 <span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (<span class="dv">1</span><span class="op">+</span>A<span class="op">*</span>cossqdtt) <span class="op">/</span> ((<span class="dv">1</span><span class="op">+</span>A)<span class="op">*</span>sintt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell" data-execution_count="52">
+<div class="cell" data-execution_count="32">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2249,12 +2256,13 @@ ZPE: True
 <p><img src="2023-09-08-Generating-synthetic-PXRD-data_files/figure-html/cell-34-output-2.png" class="img-fluid"></p>
 </div>
 </div>
+<p>The calculated patterns clearly resemble the observed diffraction data, whilst also having subtle differences in the background, noise levels, peak shapes, peak asymmetries as well as the peak positions and intensities.</p>
 </section>
 </section>
 <section id="performance" class="level1">
 <h1>Performance</h1>
 <p>Let’s test the performance of the generation code on an Nvidia Quadro RTX 5000 GPU (16 GB VRAM). We’ve got about 288k patterns to generate, how long will it take?!</p>
-<div class="cell" data-execution_count="30">
+<div class="cell" data-execution_count="33">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="st">"./"</span></span>
@@ -2266,7 +2274,7 @@ ZPE: True
 <span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>cod_id         <span class="op">=</span> np.load(data_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"cod_id.npy"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell" data-execution_count="1">
+<div class="cell" data-execution_count="35">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span>
@@ -2295,12 +2303,57 @@ ZPE: True
 <span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>                                        unit_cell[batch_idx].to(device)</span>
 <span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>                                    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-error">
-<pre><code>NameError: name 'torch' is not defined</code></pre>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████| 288/288 [00:57&lt;00:00,  4.97it/s]</code></pre>
 </div>
 </div>
 <p>288k patterns generated in about a minute - this means we can generate about 5000 diffraction patterns per second!</p>
-<p>I’m sure there are some tweaks that would boost the performance even more, but for now this will be good enough for initial experiments with neural networks.</p>
+<p>I’m sure there are some tweaks that would boost the performance even more, but for now this will be good enough for initial experiments with neural networks. A quick check with a profiler could give some hints as to where the biggest bottlenecks in the code are:</p>
+<div class="cell" data-execution_count="40">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cProfile <span class="im">as</span> profile</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pstats</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>prof <span class="op">=</span> profile.Profile()</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>prof.enable()</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>diffraction_patterns <span class="op">=</span> calculate_diffraction_patterns(</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>                                        x,</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>                                        full_data,</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>                                        crystal_systems[batch_idx].to(device),</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>                                        hkl[batch_idx].to(device),</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>                                        intensities[batch_idx].to(device),</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>                                        unit_cell[batch_idx].to(device)</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>                                    )</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>prof.disable()</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> pstats.Stats(prof).strip_dirs().sort_stats(<span class="st">"tottime"</span>)</span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>stats.print_stats(<span class="dv">10</span>) <span class="co"># top 10 rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         294 function calls in 0.422 seconds
+
+   Ordered by: internal time
+   List reduced from 94 to 10 due to restriction &lt;10&gt;
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.297    0.297    0.298    0.298 118587661.py:54(calculate_peaks)
+        1    0.086    0.086    0.086    0.086 118587661.py:67(calculate_full_patterns)
+        4    0.016    0.004    0.016    0.004 {method 'to' of 'torch._C._TensorBase' objects}
+        1    0.015    0.015    0.016    0.016 1250221022.py:1(get_MD_PO_components)
+        1    0.002    0.002    0.422    0.422 3294103451.py:6(&lt;module&gt;)
+        1    0.002    0.002    0.004    0.004 118587661.py:1(get_peak_positions)
+        1    0.000    0.000    0.000    0.000 {built-in method torch._C._linalg.linalg_inv}
+        1    0.000    0.000    0.001    0.001 895306903.py:3(get_unit_cell_perturbation)
+        1    0.000    0.000    0.405    0.405 118587661.py:82(calculate_diffraction_patterns)
+        1    0.000    0.000    0.001    0.001 3032108489.py:41(fcj)
+
+</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="40">
+<pre><code>&lt;pstats.Stats at 0x1b7da6a57c0&gt;</code></pre>
+</div>
+</div>
+<p>The filenames look a bit odd as I’m running this in a notebook. However, it looks like the peak calculation is taking the most time, which isn’t too surprising to me as there’s a lot going on there! Perhaps in future work I’ll try to improve the efficiency of the code. For now though, I think it’s good enough for us to start experimenting with training neural networks, which will be the subject of future posts.</p>
 </section>
 <section id="powcod-generated-data" class="level1">
 <h1>PowCod generated data</h1>
@@ -2308,25 +2361,25 @@ ZPE: True
 <div class="cell" data-execution_count="48">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> torch.arange(<span class="dv">4</span>)</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>diffraction_patterns <span class="op">=</span> calculate_diffraction_patterns(</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>                                        x,</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>                                        full_data,</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>                                        crystal_systems[idx].to(device),</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>                                        hkl[idx].to(device),</span>
-<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>                                        intensities[idx].to(device),</span>
-<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>                                        unit_cell[idx].to(device)</span>
-<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>                                    )</span>
-<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">16</span>,<span class="dv">10</span>))</span>
-<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, d <span class="kw">in</span> <span class="bu">enumerate</span>(diffraction_patterns):</span>
-<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>    col <span class="op">=</span> i <span class="op">%</span> <span class="dv">2</span></span>
-<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> i <span class="op">//</span> <span class="dv">2</span></span>
-<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>    ax[row][col].plot(plotdata.cpu().numpy(), d.cpu().numpy())</span>
-<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_xlabel(<span class="st">"$2</span><span class="ch">\\</span><span class="st">theta$"</span>)</span>
-<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_ylabel(<span class="st">"Intensity"</span>)</span>
-<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_title(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> - COD entry </span><span class="sc">{</span>cod_id[idx[i]]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> - http://www.crystallography.net/cod/</span><span class="sc">{</span>cod_id[idx[i]]<span class="sc">}</span><span class="ss">.html"</span>)</span>
-<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> torch.arange(<span class="dv">4</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>diffraction_patterns <span class="op">=</span> calculate_diffraction_patterns(</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                                        x,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                                        full_data,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                                        crystal_systems[idx].to(device),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>                                        hkl[idx].to(device),</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>                                        intensities[idx].to(device),</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>                                        unit_cell[idx].to(device)</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>                                    )</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">16</span>,<span class="dv">10</span>))</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, d <span class="kw">in</span> <span class="bu">enumerate</span>(diffraction_patterns):</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    col <span class="op">=</span> i <span class="op">%</span> <span class="dv">2</span></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> i <span class="op">//</span> <span class="dv">2</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    ax[row][col].plot(plotdata.cpu().numpy(), d.cpu().numpy())</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_xlabel(<span class="st">"$2</span><span class="ch">\\</span><span class="st">theta$"</span>)</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_ylabel(<span class="st">"Intensity"</span>)</span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_title(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> - COD entry </span><span class="sc">{</span>cod_id[idx[i]]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> - http://www.crystallography.net/cod/</span><span class="sc">{</span>cod_id[idx[i]]<span class="sc">}</span><span class="ss">.html"</span>)</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>1 - http://www.crystallography.net/cod/7220223.html
@@ -2335,7 +2388,7 @@ ZPE: True
 4 - http://www.crystallography.net/cod/7036591.html</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="2023-09-08-Generating-synthetic-PXRD-data_files/figure-html/cell-37-output-2.png" class="img-fluid"></p>
+<p><img src="2023-09-08-Generating-synthetic-PXRD-data_files/figure-html/cell-38-output-2.png" class="img-fluid"></p>
 </div>
 </div>
 <p>I downloaded the CIFs for each of the COD entries, and calculated their diffraction patterns using Mercury. I am very pleased that the patterns produced by the code in this post match the patterns produced by Mercury!</p>
