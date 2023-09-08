@@ -1,1 +1,9 @@
 /.quarto/
+/_site/
+/_freeze/
+*.sq
+*.infostat
+*.info
+*.search
+*.pkl
+*.npy

@@ -1,0 +1,101 @@
+Conditions,Triclinic,Monoclinic,Orthorhombic,Tetragonal,Trigonal,Hexagonal,Cubic
+no conditions,"[1, 2]","[3, 6, 10]","[16, 25, 47]","[75, 81, 83, 89, 99, 111, 115, 123]","[143, 147, 149, 150, 156, 157, 162, 164]","[168, 174, 175, 177, 183, 187, 189, 191]","[195, 200, 207, 215, 221]"
+0k0: k=2n,,"[4, 11]",,,,,
+hkl: h+k=2n h0l: h=2n 0kl: k=2n hk0: h+k=2n 0k0: k=2n h00: h=2n,,"[5, 8, 12]",,,,,
+h0l: l=2n 00l: l=2n,,"[7, 13]",[26],,,,
+"hkl: h+k=2n h0l: h,l=2n 0kl: k=2n hk0: h+k=2n 0k0: k=2n h00: h=2n 00l: l=2n",,"[9, 15]",,,,,
+h0l: l=2n 0k0: k=2n 00l: l=2n,,[14],,,,,
+00l: l=2n,,,[17],"[77, 84, 93]",,,
+h00: h=2n 0k0: k=2n,,,[18],,,,
+h00: h=2n 0k0: k=2n 00l: l=2n,,,[19],,,,
+hkl: h+k=2n 0kl: k=2n h0l: h=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,[20],,,,
+hkl: h+k=2n 0kl: k=2n h0l: h=2n hk0: h+k=2n h00: h=2n 0k0: k=2n,,,"[21, 35, 65]",,,,
+"hkl: h+k,h+l,k+l=2n 0kl: k,l=2n h0l: h,l=2n hk0: h,k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,"[22, 42, 69]",,,,
+hkl: h+k+l=2n 0kl: k+l=2n h0l: h+l=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,"[23, 24, 44, 71]",,,,
+0kl: l=2n h0l: l=2n 00l: l=2n,,,"[27, 49]",,,,
+h0l: h=2n h00: h=2n,,,[28],,,,
+0kl: l=2n h0l: h=2n h00: h=2n 00l: l=2n,,,[29],,,,
+0kl: k+l=2n h0l: l=2n 0k0: k=2n 00l: l=2n,,,[30],,,,
+h0l: h+l=2n h00: h=2n 00l: l=2n,,,[31],,,,
+0kl: k=2n h0l: h=2n h00: h=2n 0k0: k=2n,,,"[32, 55]",,,,
+0kl: k+l=2n h0l: h=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,[33],,,,
+0kl: k+l=2n h0l: h+l=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,"[34, 58]",,,,
+"hkl: h+k=2n 0kl: k=2n h0l: h,l=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,"[36, 63]",,,,
+"hkl: h+k=2n 0kl: k,l=2n h0l: h,l=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,"[37, 66]",,,,
+hkl: k+l=2n 0kl: k+l=2n h0l: l=2n hk0: k=2n 0k0: k=2n 00l: l=2n,,,[38],,,,
+"hkl: k+l=2n 0kl: k,l=2n h0l: l=2n hk0: k=2n 0k0: k=2n 00l: l=2n",,,[39],,,,
+"hkl: k+l=2n 0kl: k+l=2n h0l: h,l=2n hk0: k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,[40],,,,
+"hkl: k+l=2n 0kl: k,l=2n h0l: h,l=2n hk0: k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,[41],,,,
+"hkl: h+k,h+l,k+l=2n 0kl: k+l=4n, k,l=2n h0l: h+l=4n, h,l=2n hk0: h,k=2n h00: h=4n 0k0: k=4n 00l: l=4n",,,[43],,,,
+"hkl: h+k+l=2n 0kl: k,l=2n h0l: h,l=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,"[45, 72]",,,,
+"hkl: h+k+l=2n 0kl: k+l=2n h0l: h,l=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,[46],,,,
+0kl: k+l=2n h0l: h+l=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,[48],,,,
+0kl: k=2n h0l: h=2n hk0: h+k=2n h00: h=2n 0k0: k=2n,,,[50],,,,
+hk0: h=2n h00: h=2n,,,[51],,,,
+0kl: k+l=2n h0l: h+l=2n hk0: h=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,[52],,,,
+h0l: h+l=2n hk0: h=2n h00: h=2n 00l: l=2n,,,[53],,,,
+0kl: l=2n h0l: l=2n hk0: h=2n h00: h=2n 00l: l=2n,,,[54],,,,
+0kl: l=2n h0l: l=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,[56],,,,
+0kl: k=2n h0l: l=2n 0k0: k=2n 00l: l=2n,,,[57],,,,
+hk0: h+k=2n h00: h=2n 0k0: k=2n,,,[59],,,,
+0kl: k=2n h0l: l=2n hk0: h+k=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,[60],,,,
+0kl: k=2n h0l: l=2n hk0: h=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,[61],,,,
+0kl: k+l=2n hk0: h=2n h00: h=2n 0k0: k=2n 00l: l=2n,,,[62],,,,
+"hkl: h+k=2n 0kl: k=2n h0l: h,l=2n hk0: h,k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,[64],,,,
+"hkl: h+k=2n 0kl: k=2n h0l: h=2n hk0: h,k=2n h00: h=2n 0k0: k=2n",,,[67],,,,
+"hkl: h+k=2n 0kl: k,l=2n h0l: h,l=2n hk0: h,k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,[68],,,,
+"hkl: h+k,h+l,k+l=2n 0kl: k+l=4n, k,l=2n h0l: h+l=4n, h,l=2n hk0: h+k=4n, h,k=2n h00: h=4n 0k0: k=4n 00l: l=4n",,,[70],,,,
+"hkl: h+k+l=2n 0kl: k,l=2n h0l: h,l=2n hk0: h,k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,[73],,,,
+"hkl: h+k+l=2n 0kl: k+l=2n h0l: h+l=2n hk0: h,k=2n h00: h=2n 0k0: k=2n 00l: l=2n",,,[74],,,,
+00l: l=4n,,,,"[76, 78, 91, 95]",,,
+hkl: h+k+l=2n hk0: h+k=2n 0kl: k+l=2n hhl: l=2n 00l: l=2n h00: h=2n,,,,"[79, 82, 87, 97, 107, 119, 121, 139]",,,
+hkl: h+k+l=2n hk0: h+k=2n 0kl: k+l=2n hhl: l=2n 00l: l=4n h00: h=2n,,,,"[80, 98]",,,
+hk0: h+k=2n h00: h=2n,,,,"[85, 129]",,,
+hk0: h+k=2n 00l: l=2n h00: h=2n,,,,[86],,,
+"hkl: h+k+l=2n hk0: h,k=2n 0kl: k+l=2n hhl: l=2n 00l: l=4n h00: h=2n h-h0: h=2n",,,,[88],,,
+h00: h=2n,,,,"[90, 113]",,,"[198, 208]"
+00l: l=4n h00: h=2n,,,,"[92, 96]",,,
+00l: l=2n h00: h=2n,,,,[94],,,
+0kl: k=2n h00: h=2n,,,,"[100, 117, 127]",,,[205]
+0kl: l=2n 00l: l=2n,,,,"[101, 116, 132]",,,
+0kl: k+l=2n 00l: l=2n h00: h=2n,,,,"[102, 118, 136]",,,
+0kl: l=2n hhl: l=2n 00l: l=2n,,,,"[103, 124]",,,
+0kl: k+l=2n hhl: l=2n 00l: l=2n h00: h=2n,,,,"[104, 128]",,,
+hhl: l=2n 00l: l=2n,,,,"[105, 112, 131]",,,
+0kl: k=2n hhl: l=2n 00l: l=2n h00: h=2n,,,,"[106, 135]",,,
+"hkl: h+k+l=2n hk0: h+k=2n 0kl: k,l=2n hhl: l=2n 00l: l=2n h00: h=2n",,,,"[108, 120, 140]",,,
+hkl: h+k+l=2n hk0: h+k=2n 0kl: k+l=2n hhl: 2h+l=4n 00l: l=4n h00: h=2n h-h0: h=2n,,,,"[109, 122]",,,
+"hkl: h+k+l=2n hk0: h+k=2n 0kl: k,l=2n hhl: 2h+l=4n 00l: l=4n h00: h=2n h-h0: h=2n",,,,[110],,,
+hhl: l=2n 00l: l=2n h00: h=2n,,,,[114],,,
+hk0: h+k=2n 0kl: k=2n h00: h=2n,,,,[125],,,
+hk0: h+k=2n 0kl: k+l=2n hhl: l=2n 00l: l=2n h00: h=2n,,,,[126],,,
+hk0: h+k=2n 0kl: l=2n hhl: l=2n 00l: l=2n h00: h=2n,,,,[130],,,
+hk0: h+k=2n 0kl: k=2n hhl: l=2n 00l: l=2n h00: h=2n,,,,[133],,,
+hk0: h+k=2n 0kl: k+l=2n 00l: l=2n h00: h=2n,,,,[134],,,
+hk0: h+k=2n hhl: l=2n 00l: l=2n h00: h=2n,,,,[137],,,
+hk0: h+k=2n 0kl: l=2n 00l: l=2n h00: h=2n,,,,[138],,,
+"hkl: h+k+l=2n hk0: h,k=2n 0kl: k+l=2n hhl: 2h+l=4n 00l: l=4n h00: h=2n h-h0: h=2n",,,,[141],,,
+"hkl: h+k+l=2n hk0: h,k=2n 0kl: k,l=2n hhl: 2h+l=4n 00l: l=4n h00: h=2n h-h0: h=2n",,,,[142],,,
+000l: l=3n,,,,,"[144, 145, 151, 152, 153, 154]","[171, 172, 180, 181]",
+hkil: -h+k+l=3n hki0: -h+k=3n hh(-2h)l: l=3n h-h0l: h+l=3n 000l: l=3n h-h00: h=3n,,,,,"[146, 148, 155, 160, 166]",,
+h-h0l: l=2n 000l: l=2n,,,,,"[158, 165]","[185, 188, 193]",
+hh(-2h)l: l=2n 000l: l=2n,,,,,"[159, 163]","[186, 190, 194]",
+"hkil: -h+k+l=3n hki0: -h+k=3n hh(-2h)l: l=3n h-h0l: h+l=3n, l=2n 000l: l=6n h-h00: h=3n",,,,,"[161, 167]",,
+000l: l=6n,,,,,,"[169, 170, 178, 179]",
+000l: l=2n,,,,,,"[173, 176, 182]",
+hh(-2h)l: l=2n h-h0l: l=2n 000l: l=2n,,,,,,"[184, 192]",
+"hkl: h+k,h+l,k+l=2n 0kl: k,l=2n hhl: h+l=2n h00: h=2n",,,,,,,"[196, 202, 209, 216, 225]"
+hkl: h+k+l=2n 0kl: k+l=2n hhl: l=2n h00: h=2n,,,,,,,"[197, 199, 204, 211, 217, 229]"
+0kl: k+l=2n h00: h=2n,,,,,,,"[201, 224]"
+"hkl: h+k,h+l,k+l=2n 0kl: k+l=4n,k,l=2n hhl: h+l=2n h00: h=4n",,,,,,,[203]
+"hkl: h+k+l=2n 0kl: k,l=2n hhl: l=2n h00: h=2n",,,,,,,[206]
+"hkl: h+k=2n, h+l,k+l=2n 0kl: k,l=2n hhl: h+l=2n h00: h=4n",,,,,,,[210]
+h00: h=4n,,,,,,,"[212, 213]"
+hkl: h+k+l=2n 0kl: k+l=2n hhl: l=2n h00: h=4n,,,,,,,[214]
+hhl: l=2n h00: h=2n,,,,,,,"[218, 223]"
+"hkl: h+k=2n, h+l,k+l=2n 0kl: k,l=2n hhl: h,l=2n h00: h=2n",,,,,,,"[219, 226]"
+hkl: h+k+l=2n 0kl: k+l=2n hhl: 2h+l=4n h00: h=4n,,,,,,,[220]
+0kl: k+l=2n hhl: l=2n h00: h=2n,,,,,,,[222]
+"hkl: h+k=2n, h+l,k+l=2n 0kl: k+l=4n, k,l=2n hhl: h+l=2n h00: h=4n",,,,,,,[227]
+"hkl: h+k=2n, h+l,k+l=2n 0kl: k+l=4n, k,l=2n hhl: h,l=2n h00: h=4n",,,,,,,[228]
+"hkl: h+k+l=2n 0kl: k,l=2n hhl: 2h+l=4n h00: h=4n",,,,,,,[230]
