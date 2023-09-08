@@ -107,7 +107,6 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -213,7 +212,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
   <ul class="collapse">
   <li><a href="#filtering-powcod-data" id="toc-filtering-powcod-data" class="nav-link" data-scroll-target="#filtering-powcod-data">Filtering PowCod data</a></li>
   </ul></li>
-  <li><a href="#generating-sythetic-data" id="toc-generating-sythetic-data" class="nav-link" data-scroll-target="#generating-sythetic-data">Generating sythetic data</a>
+  <li><a href="#generating-synthetic-data" id="toc-generating-synthetic-data" class="nav-link" data-scroll-target="#generating-synthetic-data">Generating synthetic data</a>
   <ul class="collapse">
   <li><a href="#peak-positions" id="toc-peak-positions" class="nav-link" data-scroll-target="#peak-positions">Peak positions</a></li>
   <li><a href="#peak-intensities" id="toc-peak-intensities" class="nav-link" data-scroll-target="#peak-intensities">Peak intensities</a></li>
@@ -257,7 +256,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <p>As the files total only around 5.5 GB, I used pandas to read the database into memory and extract the information needed. I pickled the resultant dataframe to enable it to be more easily read in the future.</p>
 <div class="cell" data-execution_count="1">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -288,7 +287,10 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </div>
 <p>Let’s have a look at what we’ve got:</p>
 <div class="cell" data-execution_count="2">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>combined</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
@@ -533,7 +535,10 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </div>
 </div>
 <div class="cell" data-execution_count="3">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>combined.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 
@@ -658,7 +663,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </div>
 <div class="cell" data-execution_count="4">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -685,6 +690,8 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <p>To make things manageable for future machine learning projects, we’re going to set limits on the allowable unit cell dimensions and volumes. Let’s set the lower and upper limits for volume to 400 and 4000 Å³ respectively, and set the maximum unit cell length to 50 Å. We can also see some unusual looking unit cell angles, so I’m going to trim entries with cell angles below 60 and above 120 degrees (keeping 120 degrees is important to ensure we keep hexagonal unit cells).</p>
 <p>Eventually, we’re going to generate diffraction data. I’ve chosen to focus on realistic looking laboratory diffraction data, and hence I’m choosing to work in the (arbirarily chosen!) range 4 - 44 ° <span class="math inline">\(2\theta\)</span> with Cu K-α1 radiation. We’ll want to ensure that there are at least a few easily detectable peaks within this chosen range. I’ll set the lower bound for this as 10.</p>
 <div class="cell" data-execution_count="5">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>min_volume <span class="op">=</span> <span class="dv">400</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>max_volume <span class="op">=</span> <span class="dv">4000</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>max_cell_length <span class="op">=</span> <span class="dv">50</span></span>
@@ -694,11 +701,12 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>max_data_angle <span class="op">=</span> <span class="dv">44</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>wavelength <span class="op">=</span> <span class="fl">1.54056</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>min_detectable_peaks_in_range <span class="op">=</span> <span class="dv">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>Let’s first filter by the unit cell restrictions on volume, lengths and angles. We can also filter by the number of d-spacings (in the column <code>nd</code>) though we will need to come back to this again later to check that the remaining reflections are both in the range desired and also have reasonable intensities.</p>
 <div class="cell" data-execution_count="6">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> combined[(combined.volume <span class="op">&lt;=</span> max_volume) <span class="op">&amp;</span> (combined.volume <span class="op">&gt;=</span> min_volume)]</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> combined[(combined.a <span class="op">!=</span> <span class="dv">0</span>) <span class="op">&amp;</span> (combined.b <span class="op">!=</span> <span class="dv">0</span>) <span class="op">&amp;</span> (combined.c <span class="op">!=</span> <span class="dv">0</span>)]</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> combined[(combined.a <span class="op">&lt;=</span> max_cell_length) <span class="op">&amp;</span> (combined.b <span class="op">&lt;=</span> max_cell_length) <span class="op">&amp;</span> (combined.c <span class="op">&lt;=</span> max_cell_length)]</span>
@@ -834,7 +842,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <p>Let’s now replot the kernel density plots we saw earlier and see if things look a bit nicer.</p>
 <div class="cell" data-execution_count="7">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">4</span>, figsize<span class="op">=</span>(<span class="dv">18</span>,<span class="dv">7</span>))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sns.kdeplot(combined.a, ax<span class="op">=</span>ax[<span class="dv">0</span>][<span class="dv">0</span>])</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>sns.kdeplot(combined.b, ax<span class="op">=</span>ax[<span class="dv">0</span>][<span class="dv">1</span>])</span>
@@ -852,7 +860,10 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </div>
 <p>Things look a bit nicer now! Just out of interest, we’ll take a quick look at the distribution of crystal systems and space groups. Other work looking at the CSD and other databases has shown a significant imbalance in the number of crystal structures adopting each crystal system and indeed space group.</p>
 <div class="cell" data-execution_count="8">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>combined.<span class="bu">type</span>.value_counts().sort_values().iloc[::<span class="op">-</span><span class="dv">1</span>].head(<span class="dv">20</span>).plot.bar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>&lt;Axes: &gt;</code></pre>
 </div>
@@ -861,7 +872,10 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </div>
 </div>
 <div class="cell" data-execution_count="9">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>combined.spacegroup_x.value_counts().sort_values().iloc[::<span class="op">-</span><span class="dv">1</span>].head(<span class="dv">20</span>).plot.bar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>&lt;Axes: &gt;</code></pre>
 </div>
@@ -873,7 +887,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <p>For convenience for future work, it’d be good to convert these labels into their international tables numbers. Let’s write a quick function to do that, getting rid of any entries that have unknown space groups, or space group labels that are otherwise difficult to interpret.</p>
 <div class="cell" data-execution_count="10">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pymatgen.symmetry <span class="im">import</span> groups</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1028,7 +1042,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <p>Our dataframe contains the d-spacings for the observed reflections, so using Bragg’s law we can easily convert the angular range bounds into d-spacings, and then apply the filtering just described.</p>
 <div class="cell" data-execution_count="11">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>d_from_tt <span class="op">=</span> <span class="kw">lambda</span> x: wavelength<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>np.sin(np.deg2rad(x)<span class="op">/</span><span class="dv">2</span>))</span>
@@ -1047,7 +1061,7 @@ Maximum angle = 44 : Minimum d-spacing = 2.056</code></pre>
 </div>
 <div class="cell" data-execution_count="12">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> d_spacing_limits(x, min_d_spacing<span class="op">=</span><span class="dv">1</span>, max_d_spacing<span class="op">=</span><span class="dv">100</span>):</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> <span class="bu">list</span>(<span class="bu">filter</span>(<span class="va">None</span>, x.strip().split(<span class="st">","</span>)))</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> [<span class="bu">float</span>(i) <span class="cf">for</span> i <span class="kw">in</span> d]</span>
@@ -1064,8 +1078,11 @@ Maximum angle = 44 : Minimum d-spacing = 2.056</code></pre>
 </details>
 </div>
 <div class="cell" data-execution_count="13">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> combined[combined[<span class="st">"d_spacing_filter"</span>] <span class="op">==</span> <span class="va">True</span>]</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>combined.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div>
 
@@ -1199,7 +1216,10 @@ Maximum angle = 44 : Minimum d-spacing = 2.056</code></pre>
 </div>
 <p>We are down to just shy of 300k samples now, with one last bit of filtering to apply. Lastly, we’ll ensure that we have sufficient easily detectable peaks within our data range. Do to this, we need to look at the intensities:</p>
 <div class="cell" data-execution_count="14">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>combined.intensita</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <pre><code>11        1000.000000,293.781700,0.932900,880.099700,350...
 12        344.517500,136.663800,113.543400,41.743900,4.9...
@@ -1218,7 +1238,7 @@ Name: intensita, Length: 294047, dtype: object</code></pre>
 <p>Intensities are stored as a string, which has comma separated values. Each pattern is scaled to give a maximum intensity of 1000. We should ensure that in our chosen data range, the intensities that are present are actually strong enough to be observed! Let’s say we want the minimum intensity in our data range to be 0.5 % of the maximum intensity. As such, we should have at least <span class="math inline">\(N\)</span> intensities in our range with a value greater than 5. As discussed earlier, I’ve chosen to set <span class="math inline">\(N = 10\)</span>.</p>
 <div class="cell" data-execution_count="15">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> n_peaks_in_range(dspacing, intensity, min_intensity<span class="op">=</span><span class="dv">5</span>):</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    dspacing <span class="op">=</span> <span class="bu">list</span>(<span class="bu">filter</span>(<span class="va">None</span>, dspacing.strip().split(<span class="st">","</span>)))</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    dspacing <span class="op">=</span> np.array([<span class="bu">float</span>(i) <span class="cf">for</span> i <span class="kw">in</span> dspacing])</span>
@@ -1244,8 +1264,11 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 </div>
 <p>As we can see, some of the patterns we might generate would have very few or no easily detectable peaks in our chosen data range. As our final filtering step, we’ll get rid of these entries which should give us our final filtered dataset.</p>
 <div class="cell" data-execution_count="16">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> combined[combined.n_detectable_peaks_in_range <span class="op">&gt;=</span> min_detectable_peaks_in_range]</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>combined.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div>
 
@@ -1387,11 +1410,19 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 </div>
 </div>
 <p>Now that we’ve filtered our data to our requirements, the last thing to do is save the relevant information in numpy arrays which can then be quickly and easily loaded from disk when needed.</p>
-<p>The arrays to be saved will contain: - Unit cells - Crystal systems - Miller indices - Peak intensities - Space groups - COD IDs in case we want to look up a particular crystal structure</p>
+<p>The arrays to be saved will contain:</p>
+<ul>
+<li>Unit cells</li>
+<li>Crystal systems</li>
+<li>Miller indices</li>
+<li>Peak intensities</li>
+<li>Space groups</li>
+<li>COD IDs in case we want to look up a particular crystal structure</li>
+</ul>
 <p>As the number of peaks in each pattern is different, the Miller indices and Peak intensity arrays will need padding up to the maximum number, which is 500. First we’ll save the unit cells and crystal systems. I’m going to convert the strings for the crystal systems into integers using <code>np.unique</code>, and we can save the keys for use later on.</p>
 <div class="cell" data-execution_count="17">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>unit_cell <span class="op">=</span> combined[[<span class="st">"a"</span>,<span class="st">"b"</span>,<span class="st">"c"</span>,<span class="st">"alpha"</span>,<span class="st">"beta"</span>,<span class="st">"gamma"</span>]].to_numpy()</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>crystal_systems, crystal_systems_numeric <span class="op">=</span> np.unique(combined.<span class="bu">type</span>.to_numpy(), return_inverse<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>space_group_number <span class="op">=</span> combined.sg_number.to_numpy()</span>
@@ -1406,7 +1437,7 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 <p>Now we’ll deal with the Miller indices and intensities. A simple function can be used to convert the strings (as found in the dataframe) into arrays and pad them with zeros where needed. We then stack the output into our numpy arrays.</p>
 <div class="cell" data-execution_count="18">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_array(x, dtype<span class="op">=</span>np.float32):</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> np.zeros(<span class="dv">500</span>, dtype<span class="op">=</span>dtype)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> <span class="bu">list</span>(<span class="bu">filter</span>(<span class="va">None</span>, x.strip().split(<span class="st">","</span>)))</span>
@@ -1429,38 +1460,45 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 <p>Now we can save everything, as well as a configuration file to keep track of our settings, which we’ll save using the <code>json</code> format.</p>
 <div class="cell" data-execution_count="19">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>base_name <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>min_data_angle<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>max_data_angle<span class="sc">}</span><span class="ss">-CuKa1-data_</span><span class="sc">{</span>max_volume<span class="sc">}</span><span class="ss">_"</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> {}</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"base_name"</span>] <span class="op">=</span> base_name</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"min_volume"</span>] <span class="op">=</span> min_volume</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"max_volume"</span>] <span class="op">=</span> max_volume</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"max_cell_length"</span>] <span class="op">=</span> max_cell_length</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"min_cell_angle"</span>] <span class="op">=</span> min_cell_angle</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"max_cell_angle"</span>] <span class="op">=</span> max_cell_angle</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"min_data_angle"</span>] <span class="op">=</span> min_data_angle</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"max_data_angle"</span>] <span class="op">=</span> max_data_angle</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"wavelength"</span>] <span class="op">=</span> wavelength</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"min_detectable_peaks_in_range"</span>] <span class="op">=</span> min_detectable_peaks_in_range</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"crystal_systems"</span>] <span class="op">=</span> [x[<span class="dv">0</span>]<span class="op">+</span><span class="st">" = "</span><span class="op">+</span><span class="bu">str</span>(x[<span class="dv">1</span>]) <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">zip</span>(crystal_systems, np.arange(<span class="bu">len</span>(crystal_systems)))]</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"data_config.json"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    json.dump(config, f, indent<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"unit_cell.npy"</span>, unit_cell)</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"crystal_systems_numeric.npy"</span>, crystal_systems_numeric)</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"space_group_number.npy"</span>, space_group_number)</span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"hkl.npy"</span>, hkl)</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"intensities.npy"</span>, intensities)</span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"cod_id.npy"</span>, cod_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>base_name <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>min_data_angle<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>max_data_angle<span class="sc">}</span><span class="ss">-CuKa1-data_</span><span class="sc">{</span>max_volume<span class="sc">}</span><span class="ss">_"</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> {}</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"base_name"</span>] <span class="op">=</span> base_name</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"min_volume"</span>] <span class="op">=</span> min_volume</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"max_volume"</span>] <span class="op">=</span> max_volume</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"max_cell_length"</span>] <span class="op">=</span> max_cell_length</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"min_cell_angle"</span>] <span class="op">=</span> min_cell_angle</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"max_cell_angle"</span>] <span class="op">=</span> max_cell_angle</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"min_data_angle"</span>] <span class="op">=</span> min_data_angle</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"max_data_angle"</span>] <span class="op">=</span> max_data_angle</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"wavelength"</span>] <span class="op">=</span> wavelength</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"min_detectable_peaks_in_range"</span>] <span class="op">=</span> min_detectable_peaks_in_range</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>config[<span class="st">"crystal_systems"</span>] <span class="op">=</span> [x[<span class="dv">0</span>]<span class="op">+</span><span class="st">" = "</span><span class="op">+</span><span class="bu">str</span>(x[<span class="dv">1</span>]) <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">zip</span>(crystal_systems, np.arange(<span class="bu">len</span>(crystal_systems)))]</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"data_config.json"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    json.dump(config, f, indent<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"unit_cell.npy"</span>, unit_cell)</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"crystal_systems_numeric.npy"</span>, crystal_systems_numeric)</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"space_group_number.npy"</span>, space_group_number)</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"hkl.npy"</span>, hkl)</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"intensities.npy"</span>, intensities)</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>np.save(base_name<span class="op">+</span><span class="st">"cod_id.npy"</span>, cod_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 </section>
-<section id="generating-sythetic-data" class="level1">
-<h1>Generating sythetic data</h1>
+<section id="generating-synthetic-data" class="level1">
+<h1>Generating synthetic data</h1>
 <p>Now that we’ve filtered down the original PowCod database into the entries that meet the (arbitrary) conditions described earlier, it’s time to start thinking about how we can use the information to generate synthetic PXRD data.</p>
-<p>I’ve split this task into: - Peak positions - Peak intensities - Peak shapes - Noise and background</p>
+<p>I’ve split this task into:</p>
+<ul>
+<li>Peak positions</li>
+<li>Peak intensities</li>
+<li>Peak shapes</li>
+<li>Noise and background</li>
+</ul>
 <section id="peak-positions" class="level2">
 <h2 class="anchored" data-anchor-id="peak-positions">Peak positions</h2>
 <p>Rather than using the d-spacings from the database directly, we are going to make use of the unit cells and Miller indices to calculate the d-spacings (and hence angles) for the reflections. This will allow us to add a small amount of noise to the unit cell dimensions, which serves as a form of data augmentation.</p>
@@ -1469,55 +1507,54 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 <p>where <span class="math inline">\(X_{nn}\)</span> are elements of the reciprocal space metric tensor.</p>
 <p>This means that we will need a function to convert the unit cell dimensions into a matrix representation of the unit cell, invert this to determine the reciprocal lattice matrix and from this obtain the reciprocal lattice metric tensor. Once we have the reciprocal lattice metric tensor, we can calculate the d-spacings quite easily by multiplying with the Miller index array(s). However, one complication is that we want to do this for several samples simultaneously, so need to consider the shapes of our arrays.</p>
 <p>Before dealing with that, let’s write a function to simulate the effect of temperature changes, by adding a small amount of Gaussian noise to the unit cell dimensions. We will have to consider the crystal system symmetry here in order to ensure that, for example a cubic unit cell, the perturbation to lengths <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> is equal to the pertubation to <span class="math inline">\(a\)</span>. The standard deviation of the random noise to be added is going to be set to a default value of 0.05, meaning that the majority of perturbed unit cells should have edges with lengths +/- 0.15 Å from the database values, and angles +/- 0.15 ° (assuming they are allowed to vary by symmetry). This seems reasonable, and should allow us to assume that the fractional coordinates within the unit cells are unaffected, so we don’t need to worry about the effect on the relative intensities.</p>
-<div class="cell" data-execution_count="1">
+<div class="cell" data-execution_count="2">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_unit_cell_perturbation(crystal_systems, dtype<span class="op">=</span>torch.float32, stddev<span class="op">=</span><span class="fl">0.05</span>):</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Generate a perturbation for the unit cell lengths and angles for a given</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co">    crystal system.</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co">        crystal_systems (tensor):   Crystal systems for the unit cells.</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co">                                    Shape = (batch)</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">        dtype (torch.dtype, optional): Defaults to torch.float32.</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co">        stddev (float, optional):   Standard deviation for the gaussian noise.</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">                                    Defaults to 0.05.</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co">        tensor: A tensors to additively adjust the unit cell lengths and angles</span></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co">                Shape = (batch, 6)</span></span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    batchsize <span class="op">=</span> crystal_systems.shape[<span class="dv">0</span>]</span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> crystal_systems.device</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    lengths, angles <span class="op">=</span> torch.randn((<span class="dv">2</span>, batchsize, <span class="dv">3</span>), device<span class="op">=</span>device, dtype<span class="op">=</span>dtype) <span class="op">*</span> stddev</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    cubic <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">0</span></span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    hexagonal <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">1</span></span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>    monoclinic <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">2</span></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">#orthorhombic = crystal_systems == 3 # Don't need to query data for this</span></span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    tetragonal <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">4</span></span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    triclinic <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">5</span></span>
-<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>    trigonal_h <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">6</span></span>
-<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>    trigonal_r <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">7</span></span>
-<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Cubic, tetragonal, rhombohedral and hexagonal - a and b must be the same</span></span>
-<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>    lengths[:,<span class="dv">1</span>] <span class="op">=</span> torch.where(cubic <span class="op">|</span> hexagonal <span class="op">|</span> tetragonal <span class="op">|</span> trigonal_h <span class="op">|</span> trigonal_r,</span>
-<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>                            lengths[:,<span class="dv">0</span>], lengths[:,<span class="dv">1</span>])</span>
-<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Cubic and rhombohedral cells - a, b and c must be the same</span></span>
-<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>    lengths[:,<span class="dv">2</span>] <span class="op">=</span> torch.where(cubic <span class="op">|</span> trigonal_r, lengths[:,<span class="dv">0</span>], lengths[:,<span class="dv">2</span>])</span>
-<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rhombohedral and triclinic cells - could change their alpha values</span></span>
-<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">0</span>] <span class="op">=</span> torch.where((trigonal_r <span class="op">|</span> triclinic), angles[:,<span class="dv">0</span>], <span class="fl">0.</span>)</span>
-<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Triclinic or monoclinic cells could change beta values</span></span>
-<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">1</span>] <span class="op">=</span> torch.where((triclinic <span class="op">|</span> monoclinic), angles[:,<span class="dv">1</span>], <span class="fl">0.</span>)</span>
-<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Triclinc cells could change gamma</span></span>
-<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">2</span>] <span class="op">=</span> torch.where(triclinic, angles[:,<span class="dv">2</span>], <span class="fl">0.</span>)</span>
-<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rhombohedral cells - need to ensure all angles are the same</span></span>
-<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">1</span>] <span class="op">=</span> torch.where(trigonal_r, angles[:,<span class="dv">0</span>], angles[:,<span class="dv">1</span>])</span>
-<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">2</span>] <span class="op">=</span> torch.where(trigonal_r, angles[:,<span class="dv">0</span>], angles[:,<span class="dv">2</span>])</span>
-<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-46"><a href="#cb26-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> torch.concat([lengths, angles], dim<span class="op">=-</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_unit_cell_perturbation(crystal_systems, dtype<span class="op">=</span>torch.float32, stddev<span class="op">=</span><span class="fl">0.05</span>):</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Generate a perturbation for the unit cell lengths and angles for a given</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co">    crystal system.</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">        crystal_systems (tensor):   Crystal systems for the unit cells.</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co">                                    Shape = (batch)</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co">        dtype (torch.dtype, optional): Defaults to torch.float32.</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">        stddev (float, optional):   Standard deviation for the gaussian noise.</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co">                                    Defaults to 0.05.</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co">        tensor: A tensors to additively adjust the unit cell lengths and angles</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co">                Shape = (batch, 6)</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    batchsize <span class="op">=</span> crystal_systems.shape[<span class="dv">0</span>]</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> crystal_systems.device</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    lengths, angles <span class="op">=</span> torch.randn((<span class="dv">2</span>, batchsize, <span class="dv">3</span>), device<span class="op">=</span>device, dtype<span class="op">=</span>dtype) <span class="op">*</span> stddev</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    cubic <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">0</span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    hexagonal <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    monoclinic <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">#orthorhombic = crystal_systems == 3 # Don't need to query data for this</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>    tetragonal <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">4</span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    triclinic <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">5</span></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    trigonal_h <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">6</span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>    trigonal_r <span class="op">=</span> crystal_systems <span class="op">==</span> <span class="dv">7</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Cubic, tetragonal, rhombohedral and hexagonal - a and b must be the same</span></span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>    lengths[:,<span class="dv">1</span>] <span class="op">=</span> torch.where(cubic <span class="op">|</span> hexagonal <span class="op">|</span> tetragonal <span class="op">|</span> trigonal_h <span class="op">|</span> trigonal_r,</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>                            lengths[:,<span class="dv">0</span>], lengths[:,<span class="dv">1</span>])</span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Cubic and rhombohedral cells - a, b and c must be the same</span></span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    lengths[:,<span class="dv">2</span>] <span class="op">=</span> torch.where(cubic <span class="op">|</span> trigonal_r, lengths[:,<span class="dv">0</span>], lengths[:,<span class="dv">2</span>])</span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rhombohedral and triclinic cells - could change their alpha values</span></span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">0</span>] <span class="op">=</span> torch.where((trigonal_r <span class="op">|</span> triclinic), angles[:,<span class="dv">0</span>], <span class="fl">0.</span>)</span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Triclinic or monoclinic cells could change beta values</span></span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">1</span>] <span class="op">=</span> torch.where((triclinic <span class="op">|</span> monoclinic), angles[:,<span class="dv">1</span>], <span class="fl">0.</span>)</span>
+<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Triclinc cells could change gamma</span></span>
+<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">2</span>] <span class="op">=</span> torch.where(triclinic, angles[:,<span class="dv">2</span>], <span class="fl">0.</span>)</span>
+<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rhombohedral cells - need to ensure all angles are the same</span></span>
+<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">1</span>] <span class="op">=</span> torch.where(trigonal_r, angles[:,<span class="dv">0</span>], angles[:,<span class="dv">1</span>])</span>
+<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>    angles[:,<span class="dv">2</span>] <span class="op">=</span> torch.where(trigonal_r, angles[:,<span class="dv">0</span>], angles[:,<span class="dv">2</span>])</span>
+<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> torch.concat([lengths, angles], dim<span class="op">=-</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Let’s check it does what it’s meant to!</p>
@@ -1525,7 +1562,7 @@ Name: n_detectable_peaks_in_range, dtype: float64</code></pre>
 <p>With regards to angles, where the original unit cell is an angle of 90 or 120 degrees, the perturbation should be zero. So we should see a change in the beta value for monoclinic cells, a change for all values of the triclinic unit cells and the same change for each of the angles for rhombohedral cells.</p>
 <div class="cell" data-execution_count="2">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>cs_key <span class="op">=</span>  {</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Cubic"</span> : <span class="dv">0</span>,</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hexagonal"</span> :  <span class="dv">1</span>,</span>
@@ -1576,7 +1613,7 @@ Trigonal (rhombohedral axes) Angle perturbation: tensor([[0.0540, 0.0540, 0.0540
 <p>Given that we are modifying unit cells, it’s probably sensible to check that the perturbed unit cells are valid. We can do that by calculating the volume of the unit cells, with invalid unit cells returning a volume of zero.</p>
 <div class="cell" data-execution_count="3">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_lattice_matrix(unit_cell_dimensions):</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""calculate a lattice matrix from unit cell dimensions</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1616,10 +1653,13 @@ Trigonal (rhombohedral axes) Angle perturbation: tensor([[0.0540, 0.0540, 0.0540
 </div>
 <p>Let’s quickly check that this works as expected. I’ll give it a simple cubic unit cell, and an invalid unit cell.</p>
 <div class="cell" data-execution_count="4">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>cubic_cell <span class="op">=</span> torch.tensor([<span class="fl">5.0</span>, <span class="fl">5.0</span>, <span class="fl">5.0</span>, <span class="fl">90.0</span>, <span class="fl">90.0</span>, <span class="fl">90.0</span>]).unsqueeze(<span class="dv">0</span>)</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>invalid_cell <span class="op">=</span> torch.tensor([<span class="fl">5.0</span>, <span class="fl">6.0</span>, <span class="fl">7.0</span>, <span class="fl">120.0</span>, <span class="fl">120.0</span>, <span class="fl">120.0</span>]).unsqueeze(<span class="dv">0</span>)</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cubic cell valid -"</span>,get_lattice_matrix(cubic_cell)[<span class="dv">1</span>].item())</span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Invalid cell valid -"</span>, get_lattice_matrix(invalid_cell)[<span class="dv">1</span>].item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Cubic cell valid - True
 Invalid cell valid - False</code></pre>
@@ -1629,7 +1669,7 @@ Invalid cell valid - False</code></pre>
 <p>We also need a way to obtain the reflection d-spacings, and then lastly convert the d-spacings to <span class="math inline">\(2\theta\)</span>.</p>
 <div class="cell" data-execution_count="5">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_recip_lattice_metric_tensor(recip_lattice_matrix):</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Calculate the reciprocal lattice metric tensor</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1703,6 +1743,8 @@ Invalid cell valid - False</code></pre>
 </div>
 <p>To test the whole set of functions written so far, I’ll add a convenience function to calculate the peak positions from the unit cells and Miller indices.</p>
 <div class="cell" data-execution_count="6">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_peak_positions(unit_cells, hkl, zpe<span class="op">=</span><span class="va">True</span>, wavelength<span class="op">=</span><span class="fl">1.54056</span>):</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    lattice_matrix, valid <span class="op">=</span> get_lattice_matrix(unit_cells)</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    unit_cells <span class="op">=</span> unit_cells[valid]</span>
@@ -1717,6 +1759,7 @@ Invalid cell valid - False</code></pre>
 <span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>                                                twotheta.dtype)</span>
 <span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>        twotheta <span class="op">+=</span> zero_point_error</span>
 <span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> twotheta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>I’ll test that using some diffraction data for a <a href="https://www.mdpi.com/2073-4352/10/1/42">Carbamazepine:Indomethacin cocrystal</a> I published a while ago. The first 3 peaks have the following Miller indices and positions:</p>
 <table class="table">
@@ -1754,6 +1797,8 @@ Invalid cell valid - False</code></pre>
 <p><span class="math inline">\(\alpha\)</span> = 90.000, <span class="math inline">\(\beta\)</span> = 88.77132, <span class="math inline">\(\gamma\)</span> = 90.000</p>
 <p>We’ll run the function both with and without zero point errors applied.</p>
 <div class="cell" data-execution_count="7">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>coXtal_unit_cell <span class="op">=</span> torch.tensor([<span class="fl">23.573194</span>, <span class="fl">23.363375</span>, <span class="fl">5.125218</span>, <span class="fl">90.000</span>, <span class="fl">88.77132</span>, <span class="fl">90.000</span>])</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>coXtal_hkl <span class="op">=</span> torch.tensor([[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>],[<span class="dv">2</span>,<span class="dv">0</span>,<span class="dv">0</span>],[<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">0</span>]]).<span class="bu">float</span>()</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1765,6 +1810,7 @@ Invalid cell valid - False</code></pre>
 <span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, ht <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(coXtal_hkl, coXtal_twotheta.squeeze())):</span>
 <span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(ht[<span class="dv">0</span>].<span class="bu">int</span>().tolist(), <span class="ss">f"</span><span class="sc">{</span>ht[<span class="dv">1</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
 <span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>ZPE: False
 [h, k, l]  2θ
@@ -1792,7 +1838,7 @@ ZPE: True
 <p>Future work could extend this to use the more sophisticated spherical harmonic approach described <a href="http://scripts.iucr.org/cgi-bin/paper?S0021889897005918">here</a>.</p>
 <div class="cell" data-execution_count="8">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_MD_PO_components(hkl, reciprocal_lattice_metric_tensor, dspacing, factor_std<span class="op">=</span><span class="fl">0.1</span>):</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Calculate the terms needed in the March-Dollase preferred orientation</span></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">    correction.</span></span>
@@ -1871,7 +1917,7 @@ ZPE: True
 <p>We therefore need to calculate gaussian, lorentzian and the FCJ profile for each peak in the data, then convolve them together. Using the <a href="https://en.wikipedia.org/wiki/Convolution_theorem">convolution theorem</a>, we can do this by first Fourier transforming them, calculating their pointwise product in Fourier space, then inverse Fourier transforming the resultant product.</p>
 <div class="cell" data-execution_count="9">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gaussian(x, mu, sig):</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Calculate a gaussian peak</span></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2053,6 +2099,8 @@ ZPE: True
 <h2 class="anchored" data-anchor-id="background-and-noise">Background and noise</h2>
 <p>The experimental noise can be modelled as gaussian noise, which we can add very easily to the calculated diffraction data. For the background shape, we can use <a href="https://en.wikipedia.org/wiki/Chebyshev_polynomials">Chebyshev polynomials</a>.</p>
 <div class="cell" data-execution_count="24">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_noise(calculated_patterns, noise_min <span class="op">=</span> <span class="fl">0.0001</span>, noise_max <span class="op">=</span> <span class="fl">0.0025</span>):</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Get noise for the diffraction patterns to simulate experimental data</span></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2104,11 +2152,12 @@ ZPE: True
 <span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>                device<span class="op">=</span>device, dtype<span class="op">=</span>dtype))</span>
 <span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a>    bg <span class="op">=</span> (params <span class="op">*</span> chebyshev_basis).<span class="bu">sum</span>(dim<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> bg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>A quick test to see if these functions work and generate sensible looking noise and backgrounds:</p>
 <div class="cell" data-execution_count="25">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> torch.linspace(<span class="dv">4</span>,<span class="dv">44</span>,<span class="dv">2048</span>).<span class="bu">float</span>()</span>
@@ -2134,7 +2183,7 @@ ZPE: True
 <p>We now need functions to tie everything together and start to generate some data</p>
 <div class="cell" data-execution_count="26">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_peak_positions(crystal_systems, hkl, intensities, unit_cells,</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                    perturbation_stddev<span class="op">=</span><span class="fl">0.05</span>, zpemin<span class="op">=</span><span class="fl">0.03</span>, zpemax<span class="op">=</span><span class="fl">0.03</span>, wavelength<span class="op">=</span><span class="fl">1.54056</span>):</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    batchsize <span class="op">=</span> intensities.shape[<span class="dv">0</span>]</span>
@@ -2250,7 +2299,7 @@ ZPE: True
 <p>The dataset we’ll look at is that for verapamil hydrochloride. We’ll need a function to calculate the Lorentz-polarisation factor for the intensities, as this would have been corrected for in the intensities in the DASH hcv.</p>
 <div class="cell" data-execution_count="27">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>v_xye <span class="op">=</span> []</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"./files/Verap.xye"</span>, <span class="st">"r"</span>) <span class="im">as</span> f:</span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> line <span class="kw">in</span> f:</span>
@@ -2262,15 +2311,18 @@ ZPE: True
 </details>
 </div>
 <div class="cell" data-execution_count="28">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lp_factor(twotheta, ttmono<span class="op">=</span>torch.tensor([<span class="dv">28</span>])):</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> torch.cos(ttmono<span class="op">*</span>torch.pi<span class="op">/</span><span class="dv">180</span>)<span class="op">**</span><span class="dv">2</span></span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    cossqdtt <span class="op">=</span> torch.cos(twotheta<span class="op">*</span>torch.pi<span class="op">/</span><span class="dv">180</span>)<span class="op">**</span><span class="dv">2</span></span>
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    sintt <span class="op">=</span> torch.sin(twotheta<span class="op">*</span>torch.pi<span class="op">/</span><span class="dv">180</span>)</span>
 <span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (<span class="dv">1</span><span class="op">+</span>A<span class="op">*</span>cossqdtt) <span class="op">/</span> ((<span class="dv">1</span><span class="op">+</span>A)<span class="op">*</span>sintt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <div class="cell" data-execution_count="52">
 <details>
-<summary>Code</summary>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> torch.device(<span class="st">"cpu"</span>)</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>dtype <span class="op">=</span> torch.float32</span>
@@ -2327,6 +2379,8 @@ ZPE: True
 <h1>Performance</h1>
 <p>Let’s test the performance of the generation code on an Nvidia Quadro RTX 5000 GPU (16 GB VRAM). We’ve got about 288k patterns to generate, how long will it take?!</p>
 <div class="cell" data-execution_count="30">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="st">"./"</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>base_name <span class="op">=</span> <span class="st">"4-44-CuKa1-data_4000_"</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>crystal_systems <span class="op">=</span> torch.tensor(np.load(data_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"crystal_systems_numeric.npy"</span>))</span>
@@ -2334,9 +2388,12 @@ ZPE: True
 <span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>intensities     <span class="op">=</span> torch.tensor(np.load(data_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"intensities.npy"</span>)).<span class="bu">float</span>()</span>
 <span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>unit_cell       <span class="op">=</span> torch.tensor(np.load(data_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"unit_cell.npy"</span>)).<span class="bu">float</span>()</span>
 <span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>cod_id         <span class="op">=</span> np.load(data_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"cod_id.npy"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm.notebook <span class="im">import</span> tqdm</span>
+<div class="cell" data-execution_count="1">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> torch.device(<span class="st">"cuda:0"</span>)</span>
 <span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>dtype <span class="op">=</span> torch.float32</span>
@@ -2361,10 +2418,9 @@ ZPE: True
 <span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>                                        intensities[batch_idx].to(device),</span>
 <span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>                                        unit_cell[batch_idx].to(device)</span>
 <span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>                                    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"a7af7a52438c4685bb77c2bffdc5e951","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
+</details>
+<div class="cell-output cell-output-error">
+<pre><code>NameError: name 'torch' is not defined</code></pre>
 </div>
 </div>
 <p>288k patterns generated in about a minute - this means we can generate about 5000 diffraction patterns per second!</p>
@@ -2374,25 +2430,28 @@ ZPE: True
 <h1>PowCod generated data</h1>
 <p>As a final sense check, let’s see some of the data we can generate from the PowCod database</p>
 <div class="cell" data-execution_count="48">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> torch.arange(<span class="dv">4</span>)</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>diffraction_patterns <span class="op">=</span> calculate_diffraction_patterns(</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>                                        x,</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>                                        full_data,</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>                                        crystal_systems[idx].to(device),</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>                                        hkl[idx].to(device),</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>                                        intensities[idx].to(device),</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>                                        unit_cell[idx].to(device)</span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>                                    )</span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">16</span>,<span class="dv">10</span>))</span>
-<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, d <span class="kw">in</span> <span class="bu">enumerate</span>(diffraction_patterns):</span>
-<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>    col <span class="op">=</span> i <span class="op">%</span> <span class="dv">2</span></span>
-<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> i <span class="op">//</span> <span class="dv">2</span></span>
-<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>    ax[row][col].plot(plotdata.cpu().numpy(), d.cpu().numpy())</span>
-<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_xlabel(<span class="st">"$2</span><span class="ch">\\</span><span class="st">theta$"</span>)</span>
-<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_ylabel(<span class="st">"Intensity"</span>)</span>
-<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_title(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> - COD entry </span><span class="sc">{</span>cod_id[idx[i]]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> - http://www.crystallography.net/cod/</span><span class="sc">{</span>cod_id[idx[i]]<span class="sc">}</span><span class="ss">.html"</span>)</span>
-<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> torch.arange(<span class="dv">4</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>diffraction_patterns <span class="op">=</span> calculate_diffraction_patterns(</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                                        x,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                                        full_data,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                                        crystal_systems[idx].to(device),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>                                        hkl[idx].to(device),</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>                                        intensities[idx].to(device),</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>                                        unit_cell[idx].to(device)</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>                                    )</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">16</span>,<span class="dv">10</span>))</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, d <span class="kw">in</span> <span class="bu">enumerate</span>(diffraction_patterns):</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    col <span class="op">=</span> i <span class="op">%</span> <span class="dv">2</span></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> i <span class="op">//</span> <span class="dv">2</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    ax[row][col].plot(plotdata.cpu().numpy(), d.cpu().numpy())</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_xlabel(<span class="st">"$2</span><span class="ch">\\</span><span class="st">theta$"</span>)</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_ylabel(<span class="st">"Intensity"</span>)</span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>    ax[row][col].set_title(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> - COD entry </span><span class="sc">{</span>cod_id[idx[i]]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> - http://www.crystallography.net/cod/</span><span class="sc">{</span>cod_id[idx[i]]<span class="sc">}</span><span class="ss">.html"</span>)</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>1 - http://www.crystallography.net/cod/7220223.html
 2 - http://www.crystallography.net/cod/1553394.html
@@ -2408,6 +2467,7 @@ ZPE: True
 <section id="conclusions" class="level1">
 <h1>Conclusions</h1>
 <p>In this post, we’ve developed some code to allow us to read in unit cells, Miller indices, crystal system information and intensities, and rapidly generate realistic looking powder X-ray diffraction data on a GPU.</p>
+<p>I’ve put all the functions written in this code into a github repository which can be found here - <a href="https://github.com/mspillman/powcodgen/">https://github.com/mspillman/powcodgen/</a> - please feel free to submit issues, pull requests etc if you have any ideas or suggestions for improvement!</p>
 <p>In future posts, I’ll show how such data can be used to train artificial neural networks to do lots of interesting and useful things to help crystallographers understand their data.</p>
 
 
