@@ -1,0 +1,22 @@
+{
+    "base_name": "4-44-CuKa1-data_4000_",
+    "min_volume": 400,
+    "max_volume": 4000,
+    "max_cell_length": 50,
+    "min_cell_angle": 60,
+    "max_cell_angle": 120,
+    "min_data_angle": 4,
+    "max_data_angle": 44,
+    "wavelength": 1.54056,
+    "min_detectable_peaks_in_range": 10,
+    "crystal_systems": [
+        "Cubic = 0",
+        "Hexagonal = 1",
+        "Monoclinic = 2",
+        "Orthorhombic = 3",
+        "Tetragonal = 4",
+        "Triclinic = 5",
+        "Trigonal (hexagonal axes) = 6",
+        "Trigonal (rhombohedral axes) = 7"
+    ]
+}
