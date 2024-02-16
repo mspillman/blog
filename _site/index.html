@@ -70,9 +70,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -103,7 +103,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="styles.css">
-</head>
+<link rel="alternate" type="application/rss+xml" title="Mark Spillman" href="index.xml"></head>
 
 <body class="nav-fixed">
 
@@ -134,6 +134,10 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
     <a class="nav-link" href="./publications.html" rel="" target="">
  <span class="menu-text">Publications</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./subscribe.html" rel="" target="">
+ <span class="menu-text">Subscribe</span></a>
+  </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/mspillman" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
@@ -141,6 +145,11 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
   </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://twitter.com/mspillman" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="./index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
@@ -154,7 +163,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
+    <div class="quarto-title column-page">
       <h1 class="title">Posts</h1>
                       </div>
   </div>
@@ -171,11 +180,9 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(10)</span></div><div class="category" data-category="Cloud">Cloud <span class="quarto-category-count">(1)</span></div><div class="category" data-category="GALLOP">GALLOP <span class="quarto-category-count">(8)</span></div><div class="category" data-category="GCE">GCE <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Indexing">Indexing <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Machine learning">Machine learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="PXRD">PXRD <span class="quarto-category-count">(9)</span></div><div class="category" data-category="Profile">Profile <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Python">Python <span class="quarto-category-count">(5)</span></div><div class="category" data-category="Restraints">Restraints <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Synthetic data">Synthetic data <span class="quarto-category-count">(1)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
 
 
@@ -185,8 +192,33 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<div class="listing-actions-group">
+   <div class="input-group input-group-sm quarto-listing-sort">
+     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
+     <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
+       <option value="" disabled="" selected="" hidden="">Order By</option>
+       <option value="index" data-direction="asc">Default</option>
+         <option value="listing-title" data-direction="asc">
+          Title
+        </option>
+         <option value="listing-date-sort" data-direction="asc">
+          Date - Oldest
+        </option>
+         <option value="listing-date-sort" data-direction="desc">
+          Date - Newest
+        </option>
+         <option value="listing-author" data-direction="asc">
+          Author
+        </option>
+     </select>
+  </div>
+    <div class="input-group input-group-sm quarto-listing-filter">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="search form-control" placeholder="Filter">
+    </div>
+</div>
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="PXRD,Machine learning,Synthetic data" data-listing-date-sort="1694127600000" data-listing-file-modified-sort="1694182993608" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15">
+<div class="quarto-post image-right" data-index="0" data-categories="PXRD,Machine learning,Synthetic data" data-listing-date-sort="1694127600000" data-listing-file-modified-sort="1694185558901" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16">
 <div class="thumbnail">
 <p><a href="./posts/2023-09-08-Generating-synthetic-PXRD-data.html"> <img src="./posts/images/verap_generated_data.png" class="thumbnail-image"> </a></p>
 </div>
@@ -198,19 +230,6 @@ Generating synthetic diffraction data from PowCod database
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Machine learning'); return false;">
-Machine learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Synthetic data'); return false;">
-Synthetic data
-</div>
-</div>
-<a href="./posts/2023-09-08-Generating-synthetic-PXRD-data.html">
 <div class="listing-description">
 <p>Generating synthetic powder X-ray diffraction data for machine learning applications</p>
 </div>
@@ -239,19 +258,6 @@ Solving crystal structures with GALLOP after ill conditioning errors in DASH
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('GALLOP'); return false;">
-GALLOP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Profile'); return false;">
-Profile
-</div>
-</div>
-<a href="./posts/2023-01-23-profile-chi-squared-when-dash-pawley-fails.html">
 <div class="listing-description">
 <p>Pawley refinement in DASH at too high a resolution can result in a covariance matrix with ill conditioning. Using the profile <span class="math inline">\(\chi^2\)</span>, can we still solve the structure?</p>
 </div>
@@ -280,22 +286,6 @@ Restraints for rings and stereochemistry
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('GALLOP'); return false;">
-GALLOP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Restraints'); return false;">
-Restraints
-</div>
-</div>
-<a href="./posts/2022-05-30-restraints-for-rings-and-stereochemistry.html">
 <div class="listing-description">
 <p>Solving structures with unknown ring conformations or stereochemistry can be difficult and time consuming. Suitable application of restraints can help.</p>
 </div>
@@ -324,19 +314,6 @@ Solving crystal structures with GALLOP and profile <span class="math inline">\(\
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('GALLOP'); return false;">
-GALLOP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Profile'); return false;">
-Profile
-</div>
-</div>
-<a href="./posts/2022-01-08-profile-chi-squared-optimisation.html">
 <div class="listing-description">
 <p>With CPU-based code, intensity <span class="math inline">\(\chi^2\)</span> is more efficient, but does this hold for GPU-based code?</p>
 </div>
@@ -365,19 +342,6 @@ Installing and running GALLOP on cloud GPUs
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('GALLOP'); return false;">
-GALLOP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Cloud'); return false;">
-Cloud
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('GCE'); return false;">
-GCE
-</div>
-</div>
-<a href="./posts/2021-11-18-google-cloud.html">
 <div class="listing-description">
 <p>A guide to setting up GALLOP on a GPU-equipped virtual machine using Google Compute Engine</p>
 </div>
@@ -406,16 +370,6 @@ Estimating molecular volumes to aid in powder X-ray diffraction indexing
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Indexing'); return false;">
-Indexing
-</div>
-</div>
-<a href="./posts/2021-11-10-hofcalc.html">
 <div class="listing-description">
 <p>An overview of using database-derived atomic volumes to aid PXRD indexing.</p>
 </div>
@@ -444,19 +398,6 @@ Visualising hypersurfaces and optimisation trajectories
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('GALLOP'); return false;">
-GALLOP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<a href="./posts/2021-11-07-slices-of-hypersurfaces.html">
 <div class="listing-description">
 <p>Using low-dimensional slices, it’s possible to visualise both the hypersurface and trajectories taken by local-optimisers</p>
 </div>
@@ -485,19 +426,6 @@ Solving structures with the GALLOP Python API - basic use
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('GALLOP'); return false;">
-GALLOP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<a href="./posts/2021-11-03-solving-structures-with-gallop-python-api.html">
 <div class="listing-description">
 <p>A walkthrough for using the GALLOP Python API to solve the crystal structures of small molecules</p>
 </div>
@@ -526,19 +454,6 @@ Solving structures with the GALLOP browser interface
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('GALLOP'); return false;">
-GALLOP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<a href="./posts/2021-11-02-solving-structures-with-gallop-browser-interface.html">
 <div class="listing-description">
 <p>A walkthrough for using the GALLOP browser interface to solve the crystal structures of small molecules</p>
 </div>
@@ -567,19 +482,6 @@ Introduction to GALLOP
 <div class="listing-subtitle">
 
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('GALLOP'); return false;">
-GALLOP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('PXRD'); return false;">
-PXRD
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<a href="./posts/2021-10-30-introduction-to-gallop.html">
 <div class="listing-description">
 <p>An introduction to GALLOP, a recently published method for solving the crystal structures of small molecules</p>
 </div>

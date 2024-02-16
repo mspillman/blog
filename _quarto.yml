@@ -3,6 +3,8 @@ project:
 
 website:
   title: "Mark Spillman"
+  site-url: https://mspillman.github.io/blog
+  description: "Test"
   google-analytics: G-EVMREB130B
   navbar:
     right:
@@ -10,13 +12,16 @@ website:
         file: index.qmd
       - about.qmd
       - publications.qmd
+      - subscribe.qmd
       - icon: github
         href: https://github.com/mspillman
       - icon: twitter
         href: https://twitter.com/mspillman
+      - icon: rss
+        href: index.xml
 format:
   html:
-    theme: cosmo
+    theme: flatly
     css: styles.css
 
 

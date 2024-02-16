@@ -1,9 +1,11 @@
 /.quarto/
 /_site/*
 /_freeze/
+/posts/powcodgen/
 *.sq
 *.infostat
 *.info
 *.search
 *.pkl
 *.npy
+*.pth
