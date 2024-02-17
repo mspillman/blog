@@ -8,7 +8,7 @@
 
 <meta name="author" content="Mark Spillman">
 <meta name="dcterms.date" content="2024-02-11">
-<meta name="description" content="Using convolutional neural networks to index PXRD data">
+<meta name="description" content="Using neural networks to estimate lattice parameters directly from PXRD data">
 
 <title>Mark Spillman - Indexing PXRD data with Convolutional Neural Networks</title>
 <style>
@@ -138,10 +138,6 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
     <a class="nav-link" href="../publications.html" rel="" target="">
  <span class="menu-text">Publications</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../subscribe.html" rel="" target="">
- <span class="menu-text">Subscribe</span></a>
-  </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/mspillman" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
@@ -171,7 +167,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
       <h1 class="title">Indexing PXRD data with Convolutional Neural Networks</h1>
                   <div>
         <div class="description">
-          Using convolutional neural networks to index PXRD data
+          Using neural networks to estimate lattice parameters directly from PXRD data
         </div>
       </div>
                           <div class="quarto-categories">
@@ -228,8 +224,8 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>In a <a href="https://mspillman.github.io/blog/posts/2023-09-08-Generating-synthetic-PXRD-data.html">previous post</a>, I covered how to make relatively realistic looking PXRD data from the pre-processed Miller indices, d-spacings and intensity values stored in the <a href="https://www.researchgate.net/publication/273507012_QUALX20_A_qualitative_phase_analysis_software_using_the_freely_available_database_POW-COD">PowCod database</a>. We ended up with <a href="https://github.com/mspillman/powcodgen/">some code</a> that can be used to rapidly generate synthetic PXRD data using a GPU, via the PyTorch library.</p>
-<p>In this post, we’ll make use of this code to train convolutional neural networks (CNNs) to determine the lattice parameters directly from the PXRD data. This has been done before, notably by <a href="https://pubs.acs.org/doi/10.1021/jp0310596">Habershorn et al in 2004</a> and more recently in this open access paper by <a href="https://scripts.iucr.org/cgi-bin/paper?vb5020">Chitturi et al</a> in 2021.</p>
+<p>In a <a href="https://mspillman.github.io/blog/posts/2023-09-08-Generating-synthetic-PXRD-data.html">previous post</a>, we covered how to make relatively realistic looking PXRD data from the pre-processed Miller indices, <em>d</em>-spacings and intensity values stored in the <a href="https://www.researchgate.net/publication/273507012_QUALX20_A_qualitative_phase_analysis_software_using_the_freely_available_database_POW-COD">PowCod database</a>. We ended up with <a href="https://github.com/mspillman/powcodgen/">some code</a> that can be used to rapidly generate synthetic PXRD data using a GPU, via the PyTorch library.</p>
+<p>In this post, we’ll make use of this code to train convolutional neural networks (CNNs) to determine the lattice parameters directly from the PXRD data. This has been done before, notably by <a href="https://pubs.acs.org/doi/10.1021/jp0310596">Habershorn et al</a> in 2004 and more recently in this open access paper by <a href="https://scripts.iucr.org/cgi-bin/paper?vb5020">Chitturi et al</a> in 2021.</p>
 <p>As such, a good starting point will be to replicate the results by Chitturi and coworkers before trying more modern neural network architectures to see if we can improve the performance a bit!</p>
 <p>Let’s start by loading the data, and taking a look at how things stack up against the dataset used by Chitturi et al.</p>
 <div class="cell" data-execution_count="1">
@@ -290,8 +286,9 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </section>
 <section id="replicating-results" class="level1">
 <h1>Replicating results</h1>
-<p>Let’s have a go at replicating the results by Chitturi et al.&nbsp;They decided to train different models for each of the crystal systems in their dataset. Given the relatively small dataset I have available, I’ll focus on the three most populated (and coincidentally most complex / lowest symmetry) crystal systems: triclinic, monoclinic and orthorhombic.</p>
-<p>First, we’ll need a nice to load the data - let’s make a pytorch Dataset object to allow us to easily load the data. We can then easily define a training, and validation split from this. I’ve also added the option to specify indices of interest, which will allow us to pull out the specific crystal systems we want to train on.</p>
+<p>Let’s have a go at replicating the results by Chitturi et al.&nbsp;They decided to train different models for each of the crystal systems in their dataset. Given the relatively small dataset I have available, I’ll focus on the three most numerous (and coincidentally most complex / lowest symmetry) crystal systems: triclinic, monoclinic and orthorhombic.</p>
+<p>First, we’ll need a nice way to load the data. Given that the neural networks we’ll use will be written using pytorch, let’s make a pytorch <a href="https://pytorch.org/tutorials/beginner/basics/data_tutorial.html">Dataset</a> object. We can then easily define training and validation splits from this, and use efficient <a href="https://pytorch.org/tutorials/beginner/basics/data_tutorial.html">DataLoaders</a> to pass the data to the neural networks.</p>
+<p>In the code below, I’ve added the option to specify indices of interest, which will allow us to pull out the specific crystal systems we want to train on.</p>
 <div class="cell" data-execution_count="3">
 <details>
 <summary>Show the code</summary>
@@ -327,7 +324,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </details>
 </div>
 <p>We can now prepare our neural network model. I’ve <em>almost</em> replicated the one in the paper (same number of layers), but made a slight difference to the first linear layer due to the different data resolution I’m using.</p>
-<p>Chitturi et al make use of data with a resolution of 0.01 degrees per step (90 degree data range, 9000 steps), but then also use an initial MaxPooling layer with pool size of 3, meaning that the average resolution being fed into the first convolutional layer is 0.03 degrees per step. In my case, I’ll opt to use a resolution of 0.019 degrees per step (via 40 degree data range / 2048 steps), and so have chosen to omit the initial pooling layer from my implementation. The difference in data resolution also means that the dimensionality of the first linear layer will be different from Chitturi’s model. However, overall the architecture is very similar, and a similar total number of parameters is obtained:</p>
+<p>Chitturi et al make use of data with a resolution of 0.01 degrees per step (90 degree data range, 9000 steps), but then also use an initial MaxPooling layer with pool size of 3, meaning that the average resolution being fed into the first convolutional layer is 0.03 degrees per step. In my case, I’ll opt to use a resolution of 0.019 degrees per step (40 degree data range, 2048 steps), and so I have chosen to omit the initial pooling layer from my implementation. The difference in data resolution also means that the dimensionality of the first linear layer after the convolutional layers will be slightly different from Chitturi’s model. However, overall the architecture is very similar, and a similar total number of parameters is obtained:</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -346,7 +343,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </tr>
 </tbody>
 </table>
-<p>The model is fairly straightforward, with blocks of convolutional and pooling layers, followed by a stack of linear layers. I’ve implemented a module for the blocks, and then stacked them together with the linear layers to create the model.</p>
+<p>The model is fairly straightforward, with blocks of convolutional and pooling layers, followed by a stack of linear layers. This is quite similar to architectures like LeNet, which was published in the 1980s!</p>
 <div class="cell" data-execution_count="13">
 <details>
 <summary>Show the code</summary>
@@ -402,7 +399,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </div>
 <p>This model should give us a reasonable baseline which we can try to improve on later in this post. What we now need is a training loop which includes the following: - Data generation with augmentation strategies (see previous post) - Model predictions - Model loss calculation (and other metrics) - Model training - Validation loss calculation (and other metrics)</p>
 <p>Chitturi et al trained their model using the <a href="https://en.m.wikipedia.org/wiki/Huber_loss">Huber</a> loss function. This is a loss function that is designed to be more robust against outliers compared to the mean squared error, whilst encouraging convergence using a quadratic loss when the error is low. We’ll use the same loss function, but also calculate the mean squared error (MSE), the mean absolute error (MAE) and the mean absolute percentage error (MAPE) as additional metrics for this regression task. The MAPE will be the most convenient metric to use to compare against Chitturi’s model as this is reported in the article for several different variations of model they trained.</p>
-<p>Another thing to point out is that Chitturi et al trained models on “perfect” data, and then sequentially added in different augmentations (e.g.&nbsp;baseline noise, zero point errors etc). In the interest of time I’ll just dive straight in with training the model with all of the augmentation strategies employed rather than adding them incrementally.</p>
+<p>Another thing to point out is that Chitturi et al experimented with training models first on “perfect” data (i.e., no augmentations), and then sequentially added in different augmentations (e.g.&nbsp;baseline noise, zero point errors etc). In the interest of time we’ll just dive straight in with training the model with all of the augmentation strategies employed rather than adding them incrementally.</p>
 <p>Let’s define the data generation parameters</p>
 <div class="cell" data-execution_count="5">
 <details>
@@ -623,8 +620,7 @@ Best Orthorhombic val MSE: 10.664 MAE: 2.327 MAPE: 19.489 Huber: 1.882</code></p
 </div>
 </div>
 <p>As we can see from the results above, all of the metrics demonstrate that the model is learning to predict the lattice parameters. These curves appear to be still decreasing once we hit 50 epochs, and the validation and training losses are not diverging. As such, the models are undertrained at this point and would likely continue to improve with additional epochs.</p>
-<p>In terms of the performance obtained in each case, let’s summarise the MAPEs into a table to allow us to easily compare against Chitturi et al’s results. You’ll see in the table below, two sets of results from Chitturi et al’s work. The lower number is for models trained on augmented data and tested exclusively on “perfect” data (i.e.&nbsp;no augmentation). The larger number is for models trained on augmented data and tested exclusively on augmented data. I’ve indicated this in the column headings, where 100/0 means tested on 100 % perfect data, 0/100 means tested on 0 % perfect data, 100 % augmented data. As such, using this notation, all of the results produced in this post can be considered to be tested on 50 % perfect data (no impurities), 50 % augmented data (impurity peaks added).</p>
-<p>This differs to what I’ve done here in that only half of the datasets during both testing and evaluation contain impurities.</p>
+<p>In terms of the performance obtained in each case, let’s summarise the MAPEs into a table to allow us to easily compare against Chitturi et al’s results. You’ll see in the table below, two sets of results from Chitturi et al’s work. The lower number is for models trained on augmented data and tested exclusively on “perfect” data (i.e.&nbsp;no augmentation). The larger number is for models trained on augmented data and tested exclusively on augmented data. I’ve indicated this in the column headings, where 100/0 means tested on 100 % data with no impurities, 0/100 means tested on 100 % data with impurities. As such, using this notation, all of the results produced in our work can be considered to be tested on data with 50 % containing peaks from impurity phases.</p>
 <table class="table">
 <colgroup>
 <col style="width: 17%">
@@ -676,7 +672,7 @@ Best Orthorhombic val MSE: 10.664 MAE: 2.327 MAPE: 19.489 Huber: 1.882</code></p
 <p>This block begins with a <a href="https://paperswithcode.com/method/depthwise-convolution">depthwise convolutional layer</a> with a 7x7 kernel size followed by layer normalisation. This is then followed by a <a href="https://paperswithcode.com/method/pointwise-convolution">pointwise (i.e.&nbsp;1x1 kernel)</a> convolutional layer, which expands the dimensionality of the input signal by a factor of 4. The <a href="https://paperswithcode.com/method/gelu">GELU</a> non-linearity and the novel <em>Global Response Layer</em> (GRN) are applied. GRN was introduced to aid in stability during pretraining by ensuring that the feature maps produced by the model are diverse and free from redundancies.</p>
 <p>Following the GRN, the final pointwise convolution projects feature maps back to the same dimensionality as the input which enables a <a href="https://paperswithcode.com/method/residual-connection">residual/skip connection</a> to be applied, adding the input to the block to the output of the various layers we have discussed.</p>
 <p>Various combinations of these blocks with different sizes are combined, interspersed with with downsampling layers, before global average pooling is applied over the spatial dimensions of the final ConvNeXt v2 block, followed by a linear layer to compute the outputs of the model.</p>
-<p>In a slight departure from the published ConvNeXt v2 architecture, our model will flatten the output of the last convolutional layer before processing it via linear layers to compute the outputs. In my testing, the global average pooling approach didn’t work too well (discussed more below). We will also of course be converting the model to use 1D rather than 2D convolutional and normalisation layers.</p>
+<p>In a slight departure from the published ConvNeXt v2 architecture, our model will flatten the output of the last convolutional layer before processing it via linear layers to compute the outputs. In my testing, the global average pooling approach didn’t work too well (discussed more below). We will of course also be converting the model to use 1D rather than 2D convolutional and normalisation layers.</p>
 <div class="cell" data-execution_count="8">
 <details>
 <summary>Show the code</summary>
@@ -932,17 +928,17 @@ Best Orthorhombic val MSE: 6.441 MAE: 1.588 MAPE: 12.986 Huber: 1.183</code></pr
 </tr>
 </tbody>
 </table>
-<p>This does pretty well! The ConvNeXt v2 model has improved all of the metrics relative to our replication, with a significant improvement in the performance of the orthorhombic crystal system. It’s hard to tell with this level of training, but there may be a small amount of divergence between training and validation metrics occuring for the monoclinic data, as such some additional regularisation with DropPath and Dropout enabled may also help further improve performance.</p>
+<p>This does pretty well! The ConvNeXt v2 model has improved all of the metrics relative to our replication, with a significant improvement in the performance of the orthorhombic crystal system. It’s hard to tell with this level of training, but there may be a small amount of divergence between training and validation metrics occuring for the monoclinic data, as such some additional regularisation with DropPath and Dropout enabled (implemented in the code above, but not used) may also help further improve performance.</p>
 <p>However, the ConvNeXt-based model still has a relatively large number of parameters (about 5k more than our replication of Chitturi’s design). Most of these are due to the linear layers at the end of the model, which got me thinking about alternatives.</p>
 <p>One option would be to take the output of the final convolutional layer and apply some kind of pooling operation, such as the global average pooling approach used in the original paper. This would reduce the dimensionality of the final linear layer(s) significantly. However, a brief test of this did not result in good performance - the model performed substantially worse than the exiting flatten approach.</p>
 <p>However, I wondered if there was a sensible way to <em>learn how to pool</em> the outputs of this layer. The approach I ended up going with was to use a series of <a href="https://arxiv.org/abs/1706.03762">Transformer</a> encoder blocks with an additional “CLS token” concatenated with the input to these blocks, as was introduced by the <a href="https://arxiv.org/abs/1810.04805">BERT paper</a>. This additional token passes through the transformer blocks as normal, and as such it can attend to all of the other tokens in the sequence. The transformed output of this token is then used for the downstream tasks, such as sentiment analysis etc. It enables the transformer to learn how to efficiently aggregate information from across the sequence, via the multi-head attention mechanism which is beautifully explained by Jay Alammar <a href="https://jalammar.github.io/illustrated-transformer/">here</a>.</p>
-<p>In this case, the transformed CLS token is used as the input for the final linear output layer, which gives the predicted unit cell edge lengths.</p>
+<p>In this case, the transformed CLS token is used as the input for the final linear output layer(s), which gives the predicted unit cell edge lengths.</p>
 </section>
 <section id="replacing-the-linear-layers-with-transformer-blocks" class="level1">
 <h1>Replacing the linear layers with Transformer blocks</h1>
-<p>Our new model (developed below) has six additional transformer encoder blocks stacked on top of the ConvNeXt v2 blocks, and results in around 30k fewer parameters than we started with! I’ve set each transformer block to have its own learnable position embedding rather than applying a single global position embedding to the input. This is something that future work could investigate more closely, as well as alternative positional encodings such as <a href="https://arxiv.org/abs/2104.09864">RoPE</a> or <a href="https://arxiv.org/abs/2108.12409">ALiBi</a>.</p>
-<p>Other changes to the original transformer encoder model published by <a href="https://arxiv.org/abs/1706.03762">Vaswani et al</a> are as follows: - Use of GEGLU layers in the feedforward blocks, as described by <a href="https://arxiv.org/abs/2002.05202">Shazeer</a>. These have been shown to improve performance of transformers with no increase in parameter count. - Use of the <a href="https://arxiv.org/abs/2002.04745">pre-LN variant</a> where layer normalisation is applied before the multi-head self attention and feedforward layers rather than after. This helps to stablise training.</p>
-<p>The models now have about 57k parameters, which is a substantial reduction relative to the previous models we’ve looked at, which had around 80-87k parameters!</p>
+<p>Despite our new model (developed below) having six additional transformer encoder blocks stacked on top of the ConvNeXt v2 blocks, it actually has around 30k fewer parameters than we started with! I’ve set each transformer block to have its own learnable position embedding rather than applying a single global position embedding to the input. This is something that future work could investigate more closely, as well as alternative positional encodings such as <a href="https://arxiv.org/abs/2104.09864">RoPE</a> or <a href="https://arxiv.org/abs/2108.12409">ALiBi</a>.</p>
+<p>Other changes to the original transformer (encoder) model published by <a href="https://arxiv.org/abs/1706.03762">Vaswani et al</a> are as follows: - Use of GEGLU layers in the feedforward blocks, as described by <a href="https://arxiv.org/abs/2002.05202">Shazeer</a>. These have been shown to improve performance of transformers with no increase in parameter count. Further experimentation with other GLU-variants might be interesting to try. - Use of the <a href="https://arxiv.org/abs/2002.04745">pre-LN variant</a> where layer normalisation is applied before the multi-head self attention and feedforward layers rather than after. This helps to stablise training.</p>
+<p>The models now have about 57k parameters, which is a substantial reduction relative to the previous models we’ve looked at, which had around 80-87k parameters.</p>
 <div class="cell" data-execution_count="10">
 <details>
 <summary>Show the code</summary>
@@ -1195,7 +1191,7 @@ Best All_Three val MSE: 10.544 MAE: 1.991 MAPE: 14.974 Huber: 1.581</code></pre>
 </tr>
 </tbody>
 </table>
-<p>We achieve effectively the same level of performance despite significantly reducing the number of parameters used by the model! The loss curves are again still decreasing, and we don’t see any significant deviations between the training and validation losses, and as such the model is likely to improve with more training epochs. We could probably also scale up the model (with regularization if needed) and achieve even better results.</p>
+<p>We achieve effectively the same level of performance despite significantly reducing the number of parameters used by the model! The loss curves are again still decreasing, and we don’t see any significant deviations between the training and validation losses, and as such the model is likely to improve with more training epochs. We could probably also scale up the model (with regularization if needed) and achieve even better results. Looking at the loss curves, it might also be worth changing how the layers are initialised in order to facilitate easier training during the first few epochs.</p>
 <p>When training on all of the crystal systems simultaneously, the MAPE achieved is 14.97, which is competitive with the performance on monoclinic and orthorhombic cells for the replicated Chitturi et al model, though a little worse for the Triclinic case.</p>
 </section>
 <section id="conclusions" class="level1">
