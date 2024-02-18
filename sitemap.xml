@@ -2,62 +2,66 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mspillman.github.io/blog/about.html</loc>
-    <lastmod>2024-02-17T10:06:53.319Z</lastmod>
+    <lastmod>2024-02-18T10:18:13.326Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/index.html</loc>
-    <lastmod>2024-02-17T10:06:54.366Z</lastmod>
+    <lastmod>2024-02-18T10:18:14.423Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2021-10-30-introduction-to-gallop.html</loc>
-    <lastmod>2024-02-17T10:06:55.687Z</lastmod>
+    <lastmod>2024-02-18T10:18:15.729Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2021-11-02-solving-structures-with-gallop-browser-interface.html</loc>
-    <lastmod>2024-02-17T10:06:56.296Z</lastmod>
+    <lastmod>2024-02-18T10:18:16.313Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2021-11-03-solving-structures-with-gallop-python-api.html</loc>
-    <lastmod>2024-02-17T10:06:58.842Z</lastmod>
+    <lastmod>2024-02-18T10:18:18.908Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2021-11-07-slices-of-hypersurfaces.html</loc>
-    <lastmod>2024-02-17T10:07:01.243Z</lastmod>
+    <lastmod>2024-02-18T10:18:21.246Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2021-11-10-hofcalc.html</loc>
-    <lastmod>2024-02-17T10:07:02.134Z</lastmod>
+    <lastmod>2024-02-18T10:18:22.084Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2021-11-18-google-cloud.html</loc>
-    <lastmod>2024-02-17T10:07:02.741Z</lastmod>
+    <lastmod>2024-02-18T10:18:22.644Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2022-01-08-profile-chi-squared-optimisation.html</loc>
-    <lastmod>2024-02-17T10:07:03.500Z</lastmod>
+    <lastmod>2024-02-18T10:18:23.407Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2022-05-30-restraints-for-rings-and-stereochemistry.html</loc>
-    <lastmod>2024-02-17T10:07:04.511Z</lastmod>
+    <lastmod>2024-02-18T10:18:24.372Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2023-01-23-profile-chi-squared-when-dash-pawley-fails.html</loc>
-    <lastmod>2024-02-17T10:07:05.008Z</lastmod>
+    <lastmod>2024-02-18T10:18:24.880Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2023-09-08-Generating-synthetic-PXRD-data.html</loc>
-    <lastmod>2024-02-17T10:07:09.433Z</lastmod>
+    <lastmod>2024-02-18T10:18:29.147Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/posts/2024-02-11-Indexing-PXRD-data-with-Convolutional-Neural-Networks.html</loc>
-    <lastmod>2024-02-17T10:07:10.453Z</lastmod>
+    <lastmod>2024-02-18T10:18:30.148Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mspillman.github.io/blog/posts/2024-02-17-Detecting-impurities-in-PXRD-data.html</loc>
+    <lastmod>2024-02-18T10:18:30.963Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/publications.html</loc>
-    <lastmod>2024-02-17T10:07:11.462Z</lastmod>
+    <lastmod>2024-02-18T10:18:31.364Z</lastmod>
   </url>
   <url>
     <loc>https://mspillman.github.io/blog/subscribe.html</loc>
-    <lastmod>2024-02-17T10:07:11.847Z</lastmod>
+    <lastmod>2024-02-18T10:18:31.717Z</lastmod>
   </url>
 </urlset>

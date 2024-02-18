@@ -104,11 +104,9 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -217,6 +215,11 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
   <li><a href="#impurities-and-indexing" id="toc-impurities-and-indexing" class="nav-link" data-scroll-target="#impurities-and-indexing">Impurities and Indexing</a></li>
   </ul></li>
   <li><a href="#neural-network-architecture" id="toc-neural-network-architecture" class="nav-link" data-scroll-target="#neural-network-architecture">Neural network architecture</a></li>
+  <li><a href="#web-app" id="toc-web-app" class="nav-link" data-scroll-target="#web-app">Web-App</a>
+  <ul class="collapse">
+  <li><a href="#how-it-works" id="toc-how-it-works" class="nav-link" data-scroll-target="#how-it-works">How it works</a></li>
+  </ul></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a></li>
   </ul>
 </nav>
     </div>
@@ -238,7 +241,7 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 </section>
 <section id="neural-network-architecture" class="level1">
 <h1>Neural network architecture</h1>
-<p>We will make use of the hybrid ConvNeXt-Transformer architecture we used in the last post.</p>
+<p>We will make use of the hybrid ConvNeXt-Transformer architecture we used in the last post. First, we’ll load the data as a pytorch Dataset object.</p>
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Show the code</summary>
@@ -250,507 +253,700 @@ gtag('config', 'G-EVMREB130B', { 'anonymize_ip': true});
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell" data-execution_count="2">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>base_name <span class="op">=</span> <span class="st">"4-44-CuKa1-data_4000_"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>root_dir <span class="op">=</span> <span class="st">"./"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>cs <span class="op">=</span> np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"crystal_systems_numeric.npy"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>cs_key <span class="op">=</span>  {</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Cubic"</span> : <span class="dv">0</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hexagonal"</span> :  <span class="dv">1</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Monoclinic"</span> : <span class="dv">2</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Orthorhombic"</span> : <span class="dv">3</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Tetragonal"</span> : <span class="dv">4</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Triclinic"</span> : <span class="dv">5</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Trigonal (hexagonal axes)"</span> : <span class="dv">6</span>,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Trigonal (rhombohedral axes)"</span> : <span class="dv">7</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>crystal_systems <span class="op">=</span> np.unique(cs, return_counts<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>plt.bar(height<span class="op">=</span>crystal_systems[<span class="dv">1</span>], x<span class="op">=</span>[<span class="ss">f"</span><span class="sc">{</span>x<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span><span class="bu">float</span>(crystal_systems[<span class="dv">1</span>][i])<span class="op">/</span>cs<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss">%)"</span> <span class="cf">for</span> i, x <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">list</span>(cs_key.keys()))])</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">75</span>)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"POW-COD data : </span><span class="sc">{</span><span class="bu">len</span>(cs)<span class="sc">}</span><span class="ss"> entries"</span>)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>cubic_data <span class="op">=</span> np.where(cs <span class="op">==</span> <span class="dv">0</span>)[<span class="dv">0</span>]</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>hex_data <span class="op">=</span> np.where(cs <span class="op">==</span> <span class="dv">1</span>)[<span class="dv">0</span>]</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>monoclinic_data <span class="op">=</span> np.where(cs <span class="op">==</span> <span class="dv">2</span>)[<span class="dv">0</span>]</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>orthorhombic_data <span class="op">=</span> np.where(cs <span class="op">==</span> <span class="dv">3</span>)[<span class="dv">0</span>]</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>tetrag_data <span class="op">=</span> np.where(cs <span class="op">==</span> <span class="dv">4</span>)[<span class="dv">0</span>]</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>triclinic_data <span class="op">=</span> np.where(cs <span class="op">==</span> <span class="dv">5</span>)[<span class="dv">0</span>]</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Ignore the trigonal!</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>trimonoortho <span class="op">=</span> np.sort(np.hstack([monoclinic_data, orthorhombic_data, triclinic_data]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-display">
-<p><img src="2024-02-17-Detecting-impurities-in-PXRD-data_files/figure-html/cell-3-output-1.png" class="quarto-discovered-preview-image img-fluid"></p>
-</div>
-</div>
 <div class="cell" data-execution_count="3">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DiffractionData(Dataset):</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,base_name, root_dir<span class="op">=</span><span class="st">"./"</span>, idx<span class="op">=</span><span class="va">None</span>, dtype<span class="op">=</span>torch.float32):</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> idx <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.crystal_system_numeric <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"crystal_systems_numeric.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.hkl                    <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"hkl.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.intensities            <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"intensities.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.unit_cell              <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"unit_cell.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Use extinctions rather than space groups</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sg_number              <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"extinction_number.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.crystal_system_numeric <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"crystal_systems_numeric.npy"</span>), dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.hkl                    <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"hkl.npy"</span>), dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.intensities            <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"intensities.npy"</span>), dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.unit_cell              <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"unit_cell.npy"</span>), dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Use extinctions rather than space groups</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sg_number              <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"extinction_number.npy"</span>), dtype<span class="op">=</span>dtype)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__len__</span>(<span class="va">self</span>):</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.intensities)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, idx):</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.crystal_system_numeric[idx], <span class="va">self</span>.hkl[idx], <span class="va">self</span>.intensities[idx], <span class="va">self</span>.unit_cell[idx], <span class="va">self</span>.sg_number[idx]</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>base_name <span class="op">=</span> <span class="st">"4-44-CuKa1-data_4000_"</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>root_dir <span class="op">=</span> <span class="st">"./"</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> torch.device(<span class="st">"cuda:0"</span> <span class="cf">if</span> torch.cuda.is_available <span class="cf">else</span> <span class="st">"cpu"</span>)</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>dtype <span class="op">=</span> torch.float32</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DiffractionData(Dataset):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,base_name, root_dir<span class="op">=</span><span class="st">"./"</span>, idx<span class="op">=</span><span class="va">None</span>, dtype<span class="op">=</span>torch.float32):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> idx <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.crystal_system_numeric <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"crystal_systems_numeric.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.hkl                    <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"hkl.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.intensities            <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"intensities.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.unit_cell              <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"unit_cell.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Use extinctions rather than space groups</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sg_number              <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"extinction_number.npy"</span>)[idx], dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.crystal_system_numeric <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"crystal_systems_numeric.npy"</span>), dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.hkl                    <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"hkl.npy"</span>), dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.intensities            <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"intensities.npy"</span>), dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.unit_cell              <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"unit_cell.npy"</span>), dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Use extinctions rather than space groups</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sg_number              <span class="op">=</span> torch.tensor(np.load(root_dir<span class="op">+</span>base_name<span class="op">+</span><span class="st">"extinction_number.npy"</span>), dtype<span class="op">=</span>dtype)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__len__</span>(<span class="va">self</span>):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.intensities)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, idx):</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.crystal_system_numeric[idx], <span class="va">self</span>.hkl[idx], <span class="va">self</span>.intensities[idx], <span class="va">self</span>.unit_cell[idx], <span class="va">self</span>.sg_number[idx]</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>base_name <span class="op">=</span> <span class="st">"4-44-CuKa1-data_4000_"</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>root_dir <span class="op">=</span> <span class="st">"./"</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> torch.device(<span class="st">"cuda:0"</span> <span class="cf">if</span> torch.cuda.is_available <span class="cf">else</span> <span class="st">"cpu"</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>dtype <span class="op">=</span> torch.float32</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Let’s define the data generation parameters</p>
+<p>Then we’ll define the data generation parameters</p>
 <div class="cell" data-execution_count="4">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data generation parameters</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> powcodgen <span class="im">import</span> patterns</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm.auto <span class="im">import</span> tqdm</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Data generation parameters</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ------------------------------------------------------------</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ttmin <span class="op">=</span> <span class="dv">4</span>                       <span class="co"># Minimum data twotheta angle</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>ttmax <span class="op">=</span> <span class="dv">44</span>                      <span class="co"># Maximum data twotheta angle</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>peakrange <span class="op">=</span> <span class="fl">3.</span>                  <span class="co"># Buffer for peaks to move beyond the data range</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>datadim <span class="op">=</span> <span class="dv">2048</span>                  <span class="co"># Number of points in PXRD histograms</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>same_hwhm <span class="op">=</span> <span class="va">False</span>               <span class="co"># Impurity data has same peak shape &amp; hwhm as the dominant phase</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>min_impurity_intensity <span class="op">=</span> <span class="fl">0.02</span>   <span class="co"># Minimum intensity for impurity peaks</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>max_impurity_intensity <span class="op">=</span> <span class="fl">0.15</span>   <span class="co"># Maximum intensity for impurity peaks</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>add_background <span class="op">=</span> <span class="va">True</span>           <span class="co"># Include an amorphous background (Chebyshev)</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># ------------------------------------------------------------</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the tensors used as the PXRD histograms</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>full_data <span class="op">=</span> torch.linspace(ttmin<span class="op">-</span>(peakrange<span class="op">/</span><span class="dv">2</span>), ttmax<span class="op">+</span>(peakrange<span class="op">/</span><span class="dv">2</span>),</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>                        <span class="bu">int</span>(np.ceil((ttmax<span class="op">-</span>ttmin<span class="op">+</span>peakrange)<span class="op">/</span>((ttmax<span class="op">-</span>ttmin)<span class="op">/</span>datadim))),</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                        device<span class="op">=</span>device, dtype<span class="op">=</span>dtype)</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> (full_data[full_data <span class="op">&lt;=</span> ttmin<span class="op">+</span>(peakrange<span class="op">/</span><span class="dv">2</span>)]).clone() <span class="op">-</span> ttmin</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> powcodgen <span class="im">import</span> patterns</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm.auto <span class="im">import</span> tqdm</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Data generation parameters</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ------------------------------------------------------------</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>ttmin <span class="op">=</span> <span class="dv">4</span>                       <span class="co"># Minimum data twotheta angle</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ttmax <span class="op">=</span> <span class="dv">44</span>                      <span class="co"># Maximum data twotheta angle</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>peakrange <span class="op">=</span> <span class="fl">3.</span>                  <span class="co"># Buffer for peaks to move beyond the data range</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>datadim <span class="op">=</span> <span class="dv">2048</span>                  <span class="co"># Number of points in PXRD histograms</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>same_hwhm <span class="op">=</span> <span class="va">False</span>               <span class="co"># Impurity data has same peak shape &amp; hwhm as the dominant phase</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>min_impurity_intensity <span class="op">=</span> <span class="fl">0.02</span>   <span class="co"># Minimum intensity for impurity peaks</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>max_impurity_intensity <span class="op">=</span> <span class="fl">0.15</span>   <span class="co"># Maximum intensity for impurity peaks</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>add_background <span class="op">=</span> <span class="va">True</span>           <span class="co"># Include an amorphous background (Chebyshev)</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ------------------------------------------------------------</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the tensors used as the PXRD histograms</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>full_data <span class="op">=</span> torch.linspace(ttmin<span class="op">-</span>(peakrange<span class="op">/</span><span class="dv">2</span>), ttmax<span class="op">+</span>(peakrange<span class="op">/</span><span class="dv">2</span>),</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                        <span class="bu">int</span>(np.ceil((ttmax<span class="op">-</span>ttmin<span class="op">+</span>peakrange)<span class="op">/</span>((ttmax<span class="op">-</span>ttmin)<span class="op">/</span>datadim))),</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                        device<span class="op">=</span>device, dtype<span class="op">=</span>dtype)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> (full_data[full_data <span class="op">&lt;=</span> ttmin<span class="op">+</span>(peakrange<span class="op">/</span><span class="dv">2</span>)]).clone() <span class="op">-</span> ttmin</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>plotdata <span class="op">=</span> full_data[(full_data <span class="op">&gt;=</span> ttmin) <span class="op">&amp;</span> (full_data <span class="op">&lt;=</span> ttmax)].cpu()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell" data-execution_count="5">
+<p>Now we are ready to define the model, which will be effectively the same as the ConvNeXt Transformer we developed in the previous post.</p>
+<div class="cell" data-execution_count="2">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GRN(nn.Module):</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">""" Global Response Normalization, proposed in ConvNeXt v2 paper """</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim, eps <span class="op">=</span> <span class="fl">1e-6</span>):</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ConvNeXt stuff</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GRN(nn.Module):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">""" Global Response Normalization, proposed in ConvNeXt v2 paper """</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim, eps <span class="op">=</span> <span class="fl">1e-6</span>):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.eps <span class="op">=</span> eps</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.gamma <span class="op">=</span> nn.Parameter(torch.zeros(<span class="dv">1</span>, dim, <span class="dv">1</span>))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.beta <span class="op">=</span> nn.Parameter(torch.zeros(<span class="dv">1</span>, dim, <span class="dv">1</span>))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x = (B, C, T)</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Want to average first over length (T), then divide by average channel (i.e. average of C)</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Divide the L2 norms by the average for each channel</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        Gx <span class="op">=</span> x.norm(p<span class="op">=</span><span class="dv">2</span>, dim<span class="op">=</span><span class="dv">2</span>, keepdim<span class="op">=</span><span class="va">True</span>) <span class="co"># (B, C, T) --&gt; (B, C, 1)</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        Nx <span class="op">=</span> Gx <span class="op">/</span> Gx.mean(dim<span class="op">=</span><span class="dv">1</span>, keepdim<span class="op">=</span><span class="va">True</span>).clamp(<span class="bu">min</span><span class="op">=</span><span class="va">self</span>.eps) <span class="co"># (B, C, 1) / (B, 1, 1) --&gt; (B, C, 1)</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.gamma <span class="op">*</span> (x <span class="op">*</span> Nx) <span class="op">+</span> <span class="va">self</span>.beta <span class="op">+</span> x</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DropPath(nn.Module):</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">""" DropPath regularisation can be used if needed, as described here:</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">    https://arxiv.org/abs/1605.07648v4</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, p: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.5</span>, inplace: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>):</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.p <span class="op">=</span> p</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.inplace <span class="op">=</span> inplace</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> drop_path(<span class="va">self</span>, x, keep_prob: <span class="bu">float</span> <span class="op">=</span> <span class="fl">1.0</span>, inplace: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>):</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">=</span> x.new_empty(x.shape[<span class="dv">0</span>], <span class="dv">1</span>, <span class="dv">1</span>).bernoulli_(keep_prob)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        mask.div_(keep_prob)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> inplace:</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>            x.mul_(mask)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> x <span class="op">*</span> mask</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.training <span class="kw">and</span> <span class="va">self</span>.p <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> <span class="va">self</span>.drop_path(x, <span class="va">self</span>.p, <span class="va">self</span>.inplace)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>__class__<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">(p=</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>p<span class="sc">}</span><span class="ss">)"</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConvNeXtBlock(nn.Module):</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># A 1D ConvNeXt v2 block</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim, drop_path_prob<span class="op">=</span><span class="fl">0.0</span>):</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dwconv <span class="op">=</span> nn.Conv1d(in_channels<span class="op">=</span>dim, out_channels<span class="op">=</span>dim, kernel_size<span class="op">=</span><span class="dv">7</span>, groups<span class="op">=</span>dim, padding<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.norm <span class="op">=</span> nn.LayerNorm(dim)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pwconv_1 <span class="op">=</span> nn.Conv1d(dim, <span class="dv">4</span><span class="op">*</span>dim, kernel_size<span class="op">=</span><span class="dv">1</span>, padding<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.act <span class="op">=</span> nn.GELU()</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.GRN <span class="op">=</span> GRN(<span class="dv">4</span><span class="op">*</span>dim)</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pwconv_2 <span class="op">=</span> nn.Conv1d(<span class="dv">4</span><span class="op">*</span>dim, dim, kernel_size<span class="op">=</span><span class="dv">1</span>, padding<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.droppath <span class="op">=</span> DropPath(p<span class="op">=</span>drop_path_prob)</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, inputs):</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Inputs has shape (B, C, T)</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.dwconv(inputs)</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.norm(x.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="co"># Layernorm expects channels last</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pwconv_1(x)</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.act(x)</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.GRN(x)</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pwconv_2(x)</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> inputs <span class="op">+</span> <span class="va">self</span>.droppath(x)</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DownSample(nn.Module):</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_dim, out_dim):</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.norm <span class="op">=</span> nn.LayerNorm(in_dim)</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.down <span class="op">=</span> nn.Conv1d(in_dim, out_dim, kernel_size<span class="op">=</span><span class="dv">7</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.norm(x.permute(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">1</span>)).permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.down(x)</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="34">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transformer stuff</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GLU(nn.Module):</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_dim, out_dim, act<span class="op">=</span>F.gelu, bias<span class="op">=</span><span class="va">True</span>):</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.eps <span class="op">=</span> eps</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.gamma <span class="op">=</span> nn.Parameter(torch.zeros(<span class="dv">1</span>, dim, <span class="dv">1</span>))</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.beta <span class="op">=</span> nn.Parameter(torch.zeros(<span class="dv">1</span>, dim, <span class="dv">1</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.linear1 <span class="op">=</span> nn.Linear(in_dim, out_dim, bias<span class="op">=</span>bias)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.linear2 <span class="op">=</span> nn.Linear(in_dim, out_dim, bias<span class="op">=</span>bias)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.act <span class="op">=</span> act</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x = (B, C, T)</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Want to average first over length (T), then divide by average channel (i.e. average of C)</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Divide the L2 norms by the average for each channel</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        Gx <span class="op">=</span> x.norm(p<span class="op">=</span><span class="dv">2</span>, dim<span class="op">=</span><span class="dv">2</span>, keepdim<span class="op">=</span><span class="va">True</span>) <span class="co"># (B, C, T) --&gt; (B, C, 1)</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        Nx <span class="op">=</span> Gx <span class="op">/</span> Gx.mean(dim<span class="op">=</span><span class="dv">1</span>, keepdim<span class="op">=</span><span class="va">True</span>).clamp(<span class="bu">min</span><span class="op">=</span><span class="va">self</span>.eps) <span class="co"># (B, C, 1) / (B, 1, 1) --&gt; (B, C, 1)</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.gamma <span class="op">*</span> (x <span class="op">*</span> Nx) <span class="op">+</span> <span class="va">self</span>.beta <span class="op">+</span> x</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DropPath(nn.Module):</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">""" DropPath regularisation can be used if needed, as described here:</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">    https://arxiv.org/abs/1605.07648v4</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, p: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.5</span>, inplace: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>):</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.p <span class="op">=</span> p</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.inplace <span class="op">=</span> inplace</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.act(<span class="va">self</span>.linear1(x))<span class="op">*</span><span class="va">self</span>.linear2(x)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TransformerBlock(nn.Module):</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim, heads, pos_length<span class="op">=</span><span class="dv">129</span>, dropout<span class="op">=</span><span class="fl">0.1</span>):</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.heads <span class="op">=</span> heads</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.qk <span class="op">=</span> nn.Linear(dim, <span class="dv">2</span><span class="op">*</span>dim)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.v <span class="op">=</span> nn.Linear(dim, dim)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mhsa_out <span class="op">=</span> nn.Linear(dim, dim, bias<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.GLU <span class="op">=</span> GLU(dim, (dim<span class="op">*</span><span class="dv">3</span>)<span class="op">//</span><span class="dv">2</span>, bias<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.linear_out <span class="op">=</span> nn.Linear((dim<span class="op">*</span><span class="dv">3</span>)<span class="op">//</span><span class="dv">2</span>, dim, bias<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.ln1 <span class="op">=</span> nn.LayerNorm(dim)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.ln2 <span class="op">=</span> nn.LayerNorm(dim)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pos <span class="op">=</span> nn.Embedding(pos_length, embedding_dim<span class="op">=</span>dim)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dropout <span class="op">=</span> nn.Dropout(dropout)</span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> drop_path(<span class="va">self</span>, x, keep_prob: <span class="bu">float</span> <span class="op">=</span> <span class="fl">1.0</span>, inplace: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>):</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">=</span> x.new_empty(x.shape[<span class="dv">0</span>], <span class="dv">1</span>, <span class="dv">1</span>).bernoulli_(keep_prob)</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        mask.div_(keep_prob)</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> inplace:</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>            x.mul_(mask)</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> x <span class="op">*</span> mask</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.training <span class="kw">and</span> <span class="va">self</span>.p <span class="op">&gt;</span> <span class="dv">0</span>:</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> <span class="va">self</span>.drop_path(x, <span class="va">self</span>.p, <span class="va">self</span>.inplace)</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>__class__<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">(p=</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>p<span class="sc">}</span><span class="ss">)"</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> mhsa(<span class="va">self</span>, x):</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        B, T, C <span class="op">=</span> x.shape</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        q, k <span class="op">=</span> <span class="va">self</span>.qk(x <span class="op">+</span> <span class="va">self</span>.pos(torch.arange(x.shape[<span class="dv">1</span>], device<span class="op">=</span>x.device))).chunk(<span class="dv">2</span>, dim<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> <span class="va">self</span>.v(x)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        q <span class="op">=</span> q.reshape(B, <span class="va">self</span>.heads, T, C<span class="op">//</span><span class="va">self</span>.heads)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        k <span class="op">=</span> k.reshape(B, <span class="va">self</span>.heads, T, C<span class="op">//</span><span class="va">self</span>.heads)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> v.reshape(B, <span class="va">self</span>.heads, T, C<span class="op">//</span><span class="va">self</span>.heads)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.scaled_dot_product_attention(q, k, v)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.reshape(B, T, C)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.mhsa_out(x)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ffwd(<span class="va">self</span>, x):</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.GLU(x)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.linear_out(<span class="va">self</span>.dropout(x))</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
 <span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConvNeXtBlock(nn.Module):</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># A 1D ConvNeXt v2 block</span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim, drop_path_prob<span class="op">=</span><span class="fl">0.0</span>):</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dwconv <span class="op">=</span> nn.Conv1d(in_channels<span class="op">=</span>dim, out_channels<span class="op">=</span>dim, kernel_size<span class="op">=</span><span class="dv">7</span>, groups<span class="op">=</span>dim, padding<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.norm <span class="op">=</span> nn.LayerNorm(dim)</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pwconv_1 <span class="op">=</span> nn.Conv1d(dim, <span class="dv">4</span><span class="op">*</span>dim, kernel_size<span class="op">=</span><span class="dv">1</span>, padding<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.act <span class="op">=</span> nn.GELU()</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.GRN <span class="op">=</span> GRN(<span class="dv">4</span><span class="op">*</span>dim)</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pwconv_2 <span class="op">=</span> nn.Conv1d(<span class="dv">4</span><span class="op">*</span>dim, dim, kernel_size<span class="op">=</span><span class="dv">1</span>, padding<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.droppath <span class="op">=</span> DropPath(p<span class="op">=</span>drop_path_prob)</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, inputs):</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Inputs has shape (B, C, T)</span></span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.dwconv(inputs)</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.norm(x.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="co"># Layernorm expects channels last</span></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pwconv_1(x)</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.act(x)</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.GRN(x)</span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pwconv_2(x)</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> inputs <span class="op">+</span> <span class="va">self</span>.droppath(x)</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DownSample(nn.Module):</span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_dim, out_dim):</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.norm <span class="op">=</span> nn.LayerNorm(in_dim)</span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.down <span class="op">=</span> nn.Conv1d(in_dim, out_dim, kernel_size<span class="op">=</span><span class="dv">7</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.norm(x.permute(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">1</span>)).permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.down(x)</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConvNeXt(nn.Module):</span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, out_dim<span class="op">=</span><span class="dv">3</span>, depths<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">2</span>], dims<span class="op">=</span>[<span class="dv">40</span>, <span class="dv">80</span>, <span class="dv">160</span>, <span class="dv">320</span>], drop_path_prob<span class="op">=</span><span class="fl">0.5</span>, dropout<span class="op">=</span><span class="fl">0.5</span>):</span>
-<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.depths <span class="op">=</span> depths</span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.downsample_layers <span class="op">=</span> nn.ModuleList() <span class="co"># stem and 3 intermediate downsampling conv layers</span></span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.initial_conv <span class="op">=</span> nn.Conv1d(<span class="dv">1</span>, dims[<span class="dv">0</span>], kernel_size<span class="op">=</span><span class="dv">7</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.initial_norm <span class="op">=</span> nn.LayerNorm(dims[<span class="dv">0</span>])</span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.layers <span class="op">=</span> nn.ModuleList()</span>
-<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, dd <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(depths, dims)):</span>
-<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>            depth, dim <span class="op">=</span> dd</span>
-<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> d <span class="kw">in</span> <span class="bu">range</span>(depth):</span>
-<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.layers.append(ConvNeXtBlock(dim, drop_path_prob<span class="op">=</span>drop_path_prob))</span>
-<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> i<span class="op">+</span><span class="dv">1</span> <span class="op">!=</span> <span class="bu">len</span>(dims):</span>
-<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.layers.append(DownSample(in_dim<span class="op">=</span>dim, out_dim<span class="op">=</span>dims[i<span class="op">+</span><span class="dv">1</span>]))</span>
-<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.layers.append(DownSample(in_dim<span class="op">=</span>dim, out_dim<span class="op">=</span>dims[i]))</span>
-<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.final_norm <span class="op">=</span> nn.LayerNorm(<span class="dv">1024</span>)</span>
-<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.flatten <span class="op">=</span> nn.Flatten()</span>
-<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.output <span class="op">=</span> nn.Sequential(</span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">1024</span>, <span class="dv">64</span>),</span>
-<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>            nn.GELU(),</span>
-<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>            nn.Dropout(dropout),</span>
-<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">64</span>, out_dim)</span>
-<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x, shapes<span class="op">=</span><span class="va">False</span>):</span>
-<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.initial_conv(x)</span>
-<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.initial_norm(x.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)).permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
-<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapes:</span>
-<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(x.shape)</span>
-<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> l <span class="kw">in</span> <span class="va">self</span>.layers:</span>
-<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> l(x)</span>
-<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> shapes:</span>
-<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(x.shape)</span>
-<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.final_norm(F.gelu(<span class="va">self</span>.flatten(x)))<span class="co">#.permute(0,2,1)).permute(0,2,1) # global average pooling, (B, C, T) -&gt; (B, C)</span></span>
-<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>        <span class="co">#x = self.flatten(x)</span></span>
-<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapes:</span>
-<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(x.shape)</span>
-<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.output(x)</span>
-<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
-<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ConvNeXt(depths<span class="op">=</span>[<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>,<span class="dv">2</span>], dims<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">12</span>,<span class="dv">16</span>]).to(device)</span>
-<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> model(torch.randn(<span class="dv">100</span>,<span class="dv">1</span>,<span class="dv">2048</span>).to(device), shapes<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model parameters:"</span>,<span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters() <span class="cf">if</span> p.requires_grad))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x <span class="op">+</span> <span class="va">self</span>.mhsa(<span class="va">self</span>.ln1(x))</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x <span class="op">+</span> <span class="va">self</span>.ffwd(<span class="va">self</span>.ln2(x))</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConvNeXtTransformer(nn.Module):</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, datadim<span class="op">=</span><span class="dv">2048</span>, depths<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">2</span>], dims<span class="op">=</span>[<span class="dv">40</span>, <span class="dv">80</span>, <span class="dv">160</span>, <span class="dv">320</span>],</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>                 transformer_layers<span class="op">=</span><span class="dv">6</span>, attention_heads<span class="op">=</span><span class="dv">2</span>, drop_path_prob<span class="op">=</span><span class="fl">0.1</span>, dropout<span class="op">=</span><span class="fl">0.1</span>):</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.depths <span class="op">=</span> depths</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.datadim <span class="op">=</span> datadim</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.downsample_layers <span class="op">=</span> nn.ModuleList() <span class="co"># stem and 3 intermediate downsampling conv layers</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.initial_conv <span class="op">=</span> nn.Conv1d(<span class="dv">1</span>, dims[<span class="dv">0</span>], kernel_size<span class="op">=</span><span class="dv">7</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.initial_norm <span class="op">=</span> nn.LayerNorm(dims[<span class="dv">0</span>])</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.conv_layers <span class="op">=</span> nn.ModuleList()</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transformer_layers <span class="op">=</span> nn.ModuleList()</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cls_token <span class="op">=</span> nn.Embedding(<span class="dv">1</span>, dims[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, dd <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(depths, dims)):</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>            depth, dim <span class="op">=</span> dd</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> d <span class="kw">in</span> <span class="bu">range</span>(depth):</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.conv_layers.append(ConvNeXtBlock(dim, drop_path_prob<span class="op">=</span>drop_path_prob))</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> i<span class="op">+</span><span class="dv">1</span> <span class="op">!=</span> <span class="bu">len</span>(dims):</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.conv_layers.append(DownSample(in_dim<span class="op">=</span>dim, out_dim<span class="op">=</span>dims[i<span class="op">+</span><span class="dv">1</span>]))</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(transformer_layers):</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.transformer_layers.append(TransformerBlock(dims[<span class="op">-</span><span class="dv">1</span>], attention_heads, dropout<span class="op">=</span>dropout))</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.final_norm <span class="op">=</span> nn.LayerNorm(dims[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.output_pure_impure <span class="op">=</span> nn.Sequential(</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>            GLU(dims[<span class="op">-</span><span class="dv">1</span>], <span class="dv">32</span>),</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">32</span>, <span class="dv">1</span>)</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.patch_classifier <span class="op">=</span> nn.Conv1d(dims[<span class="op">-</span><span class="dv">1</span>], <span class="dv">16</span>, kernel_size<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x, shapes<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.initial_conv(x)</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.initial_norm(x.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)).permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapes:</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(x.shape)</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> l <span class="kw">in</span> <span class="va">self</span>.conv_layers:</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> l(x)</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> shapes:</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(x.shape)</span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.gelu(x)</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Now concatenate the CLS token with the output of the convolutional layers</span></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>        cls <span class="op">=</span> <span class="va">self</span>.cls_token(torch.arange(<span class="dv">1</span>, device<span class="op">=</span>x.device)).squeeze().expand(x.shape[<span class="dv">0</span>], <span class="op">-</span><span class="dv">1</span>).unsqueeze(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> torch.cat([cls, x], dim<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.permute(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> l <span class="kw">in</span> <span class="va">self</span>.transformer_layers:</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> l(x)</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> shapes:</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(x.shape)</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.final_norm(x).permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapes:</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(x.shape)</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>        x_pure_impure <span class="op">=</span> <span class="va">self</span>.output_pure_impure(x[:,:,<span class="dv">0</span>])</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>        patch_pure_impure <span class="op">=</span> <span class="va">self</span>.patch_classifier(x[:,:,<span class="dv">1</span>:])</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>        B, T, C <span class="op">=</span> patch_pure_impure.shape</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>        patch_pure_impure <span class="op">=</span> patch_pure_impure.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>).reshape(B, T<span class="op">*</span>C)</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapes:</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(x_pure_impure.shape, patch_pure_impure.shape)</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x_pure_impure, patch_pure_impure</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Model parameters: 87279</code></pre>
 </div>
-</div>
-<div class="cell" data-execution_count="6">
+<div class="cell" data-execution_count="7">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GLU(nn.Module):</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_dim, out_dim, act<span class="op">=</span>F.gelu, bias<span class="op">=</span><span class="va">True</span>):</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.linear1 <span class="op">=</span> nn.Linear(in_dim, out_dim, bias<span class="op">=</span>bias)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.linear2 <span class="op">=</span> nn.Linear(in_dim, out_dim, bias<span class="op">=</span>bias)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.act <span class="op">=</span> act</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.act(<span class="va">self</span>.linear1(x))<span class="op">*</span><span class="va">self</span>.linear2(x)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TransformerBlock(nn.Module):</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim, heads, dropout<span class="op">=</span><span class="fl">0.1</span>):</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.heads <span class="op">=</span> heads</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.qk <span class="op">=</span> nn.Linear(dim, <span class="dv">2</span><span class="op">*</span>dim)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.v <span class="op">=</span> nn.Linear(dim, dim)</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mhsa_out <span class="op">=</span> nn.Linear(dim, dim, bias<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.GLU <span class="op">=</span> GLU(dim, (dim<span class="op">*</span><span class="dv">3</span>)<span class="op">//</span><span class="dv">2</span>, bias<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.linear_out <span class="op">=</span> nn.Linear((dim<span class="op">*</span><span class="dv">3</span>)<span class="op">//</span><span class="dv">2</span>, dim, bias<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.ln1 <span class="op">=</span> nn.LayerNorm(dim)</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.ln2 <span class="op">=</span> nn.LayerNorm(dim)</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pos <span class="op">=</span> nn.Embedding(<span class="dv">256</span>, embedding_dim<span class="op">=</span>dim)</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dropout <span class="op">=</span> nn.Dropout(dropout)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> mhsa(<span class="va">self</span>, x):</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        B, T, C <span class="op">=</span> x.shape</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        q, k <span class="op">=</span> <span class="va">self</span>.qk(x <span class="op">+</span> <span class="va">self</span>.pos(torch.arange(x.shape[<span class="dv">1</span>], device<span class="op">=</span>x.device))).chunk(<span class="dv">2</span>, dim<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> <span class="va">self</span>.v(x)</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        q <span class="op">=</span> q.reshape(B, <span class="va">self</span>.heads, T, C<span class="op">//</span><span class="va">self</span>.heads)</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        k <span class="op">=</span> k.reshape(B, <span class="va">self</span>.heads, T, C<span class="op">//</span><span class="va">self</span>.heads)</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> v.reshape(B, <span class="va">self</span>.heads, T, C<span class="op">//</span><span class="va">self</span>.heads)</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.scaled_dot_product_attention(q, k, v)</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.reshape(B, T, C)</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.mhsa_out(x)</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ffwd(<span class="va">self</span>, x):</span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.GLU(x)</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.linear_out(<span class="va">self</span>.dropout(x))</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x <span class="op">+</span> <span class="va">self</span>.mhsa(<span class="va">self</span>.ln1(x))</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x <span class="op">+</span> <span class="va">self</span>.ffwd(<span class="va">self</span>.ln2(x))</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConvNeXtTransformer(nn.Module):</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, datadim<span class="op">=</span><span class="dv">2048</span>, depths<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">2</span>], dims<span class="op">=</span>[<span class="dv">40</span>, <span class="dv">80</span>, <span class="dv">160</span>, <span class="dv">320</span>],</span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>                 transformer_layers<span class="op">=</span><span class="dv">6</span>, transformer_heads<span class="op">=</span><span class="dv">2</span>, drop_path_prob<span class="op">=</span><span class="fl">0.1</span>, dropout<span class="op">=</span><span class="fl">0.1</span>):</span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.depths <span class="op">=</span> depths</span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.datadim <span class="op">=</span> datadim</span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.downsample_layers <span class="op">=</span> nn.ModuleList() <span class="co"># stem and 3 intermediate downsampling conv layers</span></span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.initial_conv <span class="op">=</span> nn.Conv1d(<span class="dv">1</span>, dims[<span class="dv">0</span>], kernel_size<span class="op">=</span><span class="dv">7</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.initial_norm <span class="op">=</span> nn.LayerNorm(dims[<span class="dv">0</span>])</span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.conv_layers <span class="op">=</span> nn.ModuleList()</span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transformer_layers <span class="op">=</span> nn.ModuleList()</span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cls_token <span class="op">=</span> nn.Embedding(<span class="dv">1</span>, dims[<span class="op">-</span><span class="dv">1</span>])</span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, dd <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(depths, dims)):</span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>            depth, dim <span class="op">=</span> dd</span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> d <span class="kw">in</span> <span class="bu">range</span>(depth):</span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.conv_layers.append(ConvNeXtBlock(dim, drop_path_prob<span class="op">=</span>drop_path_prob))</span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> i<span class="op">+</span><span class="dv">1</span> <span class="op">!=</span> <span class="bu">len</span>(dims):</span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.conv_layers.append(DownSample(in_dim<span class="op">=</span>dim, out_dim<span class="op">=</span>dims[i<span class="op">+</span><span class="dv">1</span>]))</span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(transformer_layers):</span>
-<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.transformer_layers.append(TransformerBlock(dims[<span class="op">-</span><span class="dv">1</span>], transformer_heads, dropout<span class="op">=</span>dropout))</span>
-<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.final_norm <span class="op">=</span> nn.LayerNorm(dims[<span class="op">-</span><span class="dv">1</span>])</span>
-<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.output_pure_impure <span class="op">=</span> nn.Sequential(</span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>            GLU(dims[<span class="op">-</span><span class="dv">1</span>], <span class="dv">32</span>),</span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">32</span>, <span class="dv">1</span>)</span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.patch_classifier <span class="op">=</span> nn.Conv1d(dims[<span class="op">-</span><span class="dv">1</span>], <span class="dv">16</span>, kernel_size<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x, shapes<span class="op">=</span><span class="va">False</span>):</span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.initial_conv(x)</span>
-<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.initial_norm(x.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)).permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
-<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapes:</span>
-<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(x.shape)</span>
-<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> l <span class="kw">in</span> <span class="va">self</span>.conv_layers:</span>
-<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> l(x)</span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> shapes:</span>
-<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(x.shape)</span>
-<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.gelu(x)</span>
-<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Now concatenate the CLS token with the output of the convolutional layers</span></span>
-<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>        cls <span class="op">=</span> <span class="va">self</span>.cls_token(torch.arange(<span class="dv">1</span>, device<span class="op">=</span>x.device)).squeeze().expand(x.shape[<span class="dv">0</span>], <span class="op">-</span><span class="dv">1</span>).unsqueeze(<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> torch.cat([cls, x], dim<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.permute(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> l <span class="kw">in</span> <span class="va">self</span>.transformer_layers:</span>
-<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> l(x)</span>
-<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> shapes:</span>
-<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(x.shape)</span>
-<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.final_norm(x).permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
-<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapes:</span>
-<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(x.shape)</span>
-<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>        x_pure_impure <span class="op">=</span> <span class="va">self</span>.output_pure_impure(x[:,:,<span class="dv">0</span>])</span>
-<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>        patch_pure_impure <span class="op">=</span> <span class="va">self</span>.patch_classifier(x[:,:,<span class="dv">1</span>:])</span>
-<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>        B, T, C <span class="op">=</span> patch_pure_impure.shape</span>
-<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>        patch_pure_impure <span class="op">=</span> patch_pure_impure.permute(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>).reshape(B, T<span class="op">*</span>C)</span>
-<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapes:</span>
-<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(x_pure_impure.shape, patch_pure_impure.shape)</span>
-<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x_pure_impure, patch_pure_impure</span>
-<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ConvNeXtTransformer(depths<span class="op">=</span>[<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>,<span class="dv">2</span>], dims<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">12</span>,<span class="dv">16</span>], transformer_layers<span class="op">=</span><span class="dv">6</span>, transformer_heads<span class="op">=</span><span class="dv">2</span>).to(device)</span>
-<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> model(torch.randn(<span class="dv">100</span>,<span class="dv">1</span>,<span class="dv">2048</span>).to(device), shapes<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model parameters:"</span>,<span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters() <span class="cf">if</span> p.requires_grad))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_stats(outputs, ground_truth):</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        pred <span class="op">=</span> (torch.sigmoid(outputs) <span class="op">&gt;</span> <span class="fl">0.5</span>).<span class="bu">type</span>(torch.<span class="bu">int</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        TP <span class="op">=</span> ((ground_truth <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (pred <span class="op">==</span> <span class="dv">1</span>)).<span class="bu">sum</span>()</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        FP <span class="op">=</span> ((ground_truth <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (pred <span class="op">==</span> <span class="dv">1</span>)).<span class="bu">sum</span>()</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        TN <span class="op">=</span> ((ground_truth <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (pred <span class="op">==</span> <span class="dv">0</span>)).<span class="bu">sum</span>()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        FN <span class="op">=</span> ((ground_truth <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (pred <span class="op">==</span> <span class="dv">0</span>)).<span class="bu">sum</span>()</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        precision <span class="op">=</span> torch.nan_to_num(TP<span class="op">/</span>(TP<span class="op">+</span>FP))</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        recall <span class="op">=</span> torch.nan_to_num(TP<span class="op">/</span>(TP<span class="op">+</span>FN))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        f1 <span class="op">=</span> torch.nan_to_num(<span class="fl">2.</span><span class="op">*</span>(precision<span class="op">*</span>recall)<span class="op">/</span>(precision<span class="op">+</span>recall))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        accuracy <span class="op">=</span> torch.nan_to_num((TP<span class="op">+</span>TN)<span class="op">/</span>(TP<span class="op">+</span>TN<span class="op">+</span>FP<span class="op">+</span>FN))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        mcc <span class="op">=</span> torch.nan_to_num(((TP<span class="op">*</span>TN) <span class="op">-</span> (FP<span class="op">*</span>FN)) <span class="op">/</span> torch.sqrt((TP<span class="op">+</span>FP)<span class="op">*</span>(TP<span class="op">+</span>FN)<span class="op">*</span>(TN<span class="op">+</span>FP)<span class="op">*</span>(TN<span class="op">+</span>FN)))</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> precision, recall, f1, accuracy, mcc</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_lr(it):</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Taken from https://github.com/karpathy/nanoGPT/blob/master/train.py</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1) linear warmup for warmup_iters steps</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> it <span class="op">&lt;</span> warmup_iters:</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> learning_rate <span class="op">*</span> it <span class="op">/</span> warmup_iters</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2) if it &gt; lr_decay_iters, return min learning rate</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> it <span class="op">&gt;</span> lr_decay_iters:</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> min_lr</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3) in between, use cosine decay down to min learning rate</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    decay_ratio <span class="op">=</span> (it <span class="op">-</span> warmup_iters) <span class="op">/</span> (lr_decay_iters <span class="op">-</span> warmup_iters)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="dv">0</span> <span class="op">&lt;=</span> decay_ratio <span class="op">&lt;=</span> <span class="dv">1</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    coeff <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (<span class="fl">1.0</span> <span class="op">+</span> math.cos(math.pi <span class="op">*</span> decay_ratio)) <span class="co"># coeff ranges 0..1</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> min_lr <span class="op">+</span> coeff <span class="op">*</span> (learning_rate <span class="op">-</span> min_lr)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Training / validation code</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_loss(iter_num, dataloader, model, optimizer, epoch,</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>            train<span class="op">=</span><span class="va">True</span>, show_pbar<span class="op">=</span><span class="va">True</span>, impure_peak_threshold<span class="op">=</span><span class="fl">2.5e-2</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>            plot<span class="op">=</span><span class="va">True</span>, decay_lr<span class="op">=</span><span class="va">True</span>, learning_rate<span class="op">=</span><span class="fl">1e-3</span>):</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">    Get the losses for an epoch. Toggle between the dataloaders so the same code can be recycled</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">    for the training and validation sets.</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_pbar:</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>        pbar <span class="op">=</span> tqdm(dataloader)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>        pbar <span class="op">=</span> dataloader</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    logs <span class="op">=</span> []</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> train:</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        model.<span class="bu">eval</span>()</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch_cs, batch_hkl, batch_i, batch_cell, batch_sg_number <span class="kw">in</span> pbar:</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># zero the parameter gradients</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad(set_to_none<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>        <span class="co"># forward + backward + optimize</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(batch_cs) <span class="op">%</span> <span class="dv">2</span> <span class="op">!=</span> <span class="dv">0</span> <span class="kw">or</span> <span class="bu">len</span>(batch_cs) <span class="op">%</span> <span class="dv">3</span> <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>            maxlength <span class="op">=</span> <span class="dv">6</span><span class="op">*</span>(batch_cs.shape[<span class="dv">0</span>]<span class="op">//</span><span class="dv">6</span>)</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>            batch_cs <span class="op">=</span> batch_cs[:maxlength]</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>            batch_hkl <span class="op">=</span> batch_hkl[:maxlength]</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>            batch_i <span class="op">=</span> batch_i[:maxlength]</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>            batch_cell <span class="op">=</span> batch_cell[:maxlength]</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>            batch_sg_number <span class="op">=</span> batch_sg_number[:maxlength]</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>        calcdata <span class="op">=</span> patterns.calculate_diffraction_patterns_with_impurities(</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>                                        x,</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>                                        full_data,</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>                                        batch_cs.to(device),</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>                                        batch_hkl.to(device),</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>                                        batch_i.to(device),</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>                                        batch_cell.to(device),</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>                                        batch_sg_number.to(device),</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>                                        same_hwhm<span class="op">=</span>same_hwhm,</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>                                        min_impurity_intensity<span class="op">=</span>min_impurity_intensity,</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>                                        max_impurity_intensity<span class="op">=</span>max_impurity_intensity,</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>                                        add_background <span class="op">=</span> add_background,</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>                                    )</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>        combined, pure_patterns, impure_patterns, pure_impure, cs, cell, sgs, hkls <span class="op">=</span> calcdata</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>        pred_pure, pred_peaks <span class="op">=</span> model(combined.unsqueeze(<span class="dv">1</span>))</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>        impurepeaks <span class="op">=</span> ((impure_patterns <span class="op">-</span> pure_patterns) <span class="op">&gt;</span> impure_peak_threshold).<span class="bu">type</span>(dtype)</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>        pure_impure_bce <span class="op">=</span> F.binary_cross_entropy_with_logits(pred_pure.squeeze(), pure_impure)</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>        pred_peaks_bce <span class="op">=</span> F.binary_cross_entropy_with_logits(pred_peaks.squeeze(), impurepeaks)</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>        <span class="co"># precision, recall, f1, accuracy, mcc</span></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>        p_i_stats <span class="op">=</span> get_stats(pred_pure.squeeze(), pure_impure)</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>        patch_stats <span class="op">=</span> get_stats(pred_peaks.squeeze(), impurepeaks)</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> pure_impure_bce <span class="op">+</span> pred_peaks_bce</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> train:</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>            <span class="co"># determine and set the learning rate for this iteration</span></span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>            lr <span class="op">=</span> get_lr(iter_num) <span class="cf">if</span> decay_lr <span class="cf">else</span> learning_rate</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> param_group <span class="kw">in</span> optimizer.param_groups:</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>                param_group[<span class="st">'lr'</span>] <span class="op">=</span> lr</span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>            loss.backward()</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>            iter_num <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>            nn.utils.clip_grad_norm_(model.parameters(), grad_clip)</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>            optimizer.step()</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> show_pbar:</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>            pbar.set_description_str(<span class="ss">f"Epoch: </span><span class="sc">{</span>epoch<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> Loss: </span><span class="sc">{</span>loss<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> P/I Prec </span><span class="sc">{</span>p_i_stats[<span class="dv">0</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> P/I Rec </span><span class="sc">{</span>p_i_stats[<span class="dv">1</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> Patch Prec </span><span class="sc">{</span>patch_stats[<span class="dv">0</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> Patch Rec </span><span class="sc">{</span>patch_stats[<span class="dv">1</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>        logs.append(torch.tensor([p_i_stats <span class="op">+</span> patch_stats]))</span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> train:</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> plot:</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>                plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">4</span>))</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>                plt.plot([<span class="dv">4</span>, <span class="dv">44</span>],[<span class="fl">0.5</span>,<span class="fl">0.5</span>], c<span class="op">=</span><span class="st">"k"</span>, alpha<span class="op">=</span><span class="fl">0.15</span>)</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>                plt.plot(plotdata, combined[i].cpu())</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>                plt.plot(plotdata, <span class="op">-</span><span class="dv">1</span><span class="op">*</span>impure_patterns[i].cpu())</span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>                plt.plot(plotdata, F.sigmoid(pred_peaks[i]).detach().cpu(), alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>                plt.plot(plotdata, impurepeaks[i].cpu(), alpha<span class="op">=</span><span class="fl">0.2</span>, c<span class="op">=</span><span class="st">"k"</span>)</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>                plt.title(<span class="ss">f"</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>F<span class="sc">.</span>sigmoid(pred_pure[i])<span class="sc">.</span>detach()<span class="sc">.</span>item()<span class="sc">:.2f}</span><span class="ss"> %"</span>)</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>                plt.show()</span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>        model.train()</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> iter_num, logs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Model parameters: 57341</code></pre>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>C:\Users\Mark\AppData\Local\Temp\ipykernel_10408\3200872698.py:33: UserWarning: 1Torch was not compiled with flash attention. (Triggered internally at C:\cb\pytorch_1000000000000\work\aten\src\ATen\native\transformers\cuda\sdp_utils.cpp:263.)
-  x = F.scaled_dot_product_attention(q, k, v)</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="11">
+<p>Set up the training data and associated variables</p>
+<div class="cell" data-execution_count="8">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_stats(outputs, ground_truth):</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        pred <span class="op">=</span> (torch.sigmoid(outputs) <span class="op">&gt;</span> <span class="fl">0.5</span>).<span class="bu">type</span>(torch.<span class="bu">int</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        TP <span class="op">=</span> ((ground_truth <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (pred <span class="op">==</span> <span class="dv">1</span>)).<span class="bu">sum</span>()</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        FP <span class="op">=</span> ((ground_truth <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (pred <span class="op">==</span> <span class="dv">1</span>)).<span class="bu">sum</span>()</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        TN <span class="op">=</span> ((ground_truth <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (pred <span class="op">==</span> <span class="dv">0</span>)).<span class="bu">sum</span>()</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        FN <span class="op">=</span> ((ground_truth <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (pred <span class="op">==</span> <span class="dv">0</span>)).<span class="bu">sum</span>()</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        precision <span class="op">=</span> torch.nan_to_num(TP<span class="op">/</span>(TP<span class="op">+</span>FP))</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        recall <span class="op">=</span> torch.nan_to_num(TP<span class="op">/</span>(TP<span class="op">+</span>FN))</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        f1 <span class="op">=</span> torch.nan_to_num(<span class="fl">2.</span><span class="op">*</span>(precision<span class="op">*</span>recall)<span class="op">/</span>(precision<span class="op">+</span>recall))</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        accuracy <span class="op">=</span> torch.nan_to_num((TP<span class="op">+</span>TN)<span class="op">/</span>(TP<span class="op">+</span>TN<span class="op">+</span>FP<span class="op">+</span>FN))</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        mcc <span class="op">=</span> torch.nan_to_num(((TP<span class="op">*</span>TN) <span class="op">-</span> (FP<span class="op">*</span>FN)) <span class="op">/</span> torch.sqrt((TP<span class="op">+</span>FP)<span class="op">*</span>(TP<span class="op">+</span>FN)<span class="op">*</span>(TN<span class="op">+</span>FP)<span class="op">*</span>(TN<span class="op">+</span>FN)))</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> precision, recall, f1, accuracy, mcc</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Training / validation code</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_loss(dataloader, model, optimizer, epoch, train<span class="op">=</span><span class="va">True</span>, show_pbar<span class="op">=</span><span class="va">True</span>, impure_peak_threshold<span class="op">=</span><span class="fl">2.5e-2</span>, plot<span class="op">=</span><span class="va">True</span>):</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">    Get the losses for an epoch. Toggle between the dataloaders so the same code can be recycled</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">    for the training and validation sets.</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_pbar:</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>        pbar <span class="op">=</span> tqdm(dataloader)</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>        pbar <span class="op">=</span> dataloader</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    logs <span class="op">=</span> []</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> train:</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>        model.<span class="bu">eval</span>()</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch_cs, batch_hkl, batch_i, batch_cell, batch_sg_number <span class="kw">in</span> pbar:</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># zero the parameter gradients</span></span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad(set_to_none<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># forward + backward + optimize</span></span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(batch_cs) <span class="op">%</span> <span class="dv">2</span> <span class="op">!=</span> <span class="dv">0</span> <span class="kw">or</span> <span class="bu">len</span>(batch_cs) <span class="op">%</span> <span class="dv">3</span> <span class="op">!=</span> <span class="dv">0</span>:</span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>            maxlength <span class="op">=</span> <span class="dv">6</span><span class="op">*</span>(batch_cs.shape[<span class="dv">0</span>]<span class="op">//</span><span class="dv">6</span>)</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>            batch_cs <span class="op">=</span> batch_cs[:maxlength]</span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>            batch_hkl <span class="op">=</span> batch_hkl[:maxlength]</span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>            batch_i <span class="op">=</span> batch_i[:maxlength]</span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>            batch_cell <span class="op">=</span> batch_cell[:maxlength]</span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>            batch_sg_number <span class="op">=</span> batch_sg_number[:maxlength]</span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>        calcdata <span class="op">=</span> patterns.calculate_diffraction_patterns_with_impurities(</span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>                                        x,</span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>                                        full_data,</span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>                                        batch_cs.to(device),</span>
-<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>                                        batch_hkl.to(device),</span>
-<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>                                        batch_i.to(device),</span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>                                        batch_cell.to(device),</span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>                                        batch_sg_number.to(device),</span>
-<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>                                        same_hwhm<span class="op">=</span>same_hwhm,</span>
-<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>                                        min_impurity_intensity<span class="op">=</span>min_impurity_intensity,</span>
-<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>                                        max_impurity_intensity<span class="op">=</span>max_impurity_intensity,</span>
-<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>                                        add_background <span class="op">=</span> add_background,</span>
-<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>                                    )</span>
-<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>        combined, pure_patterns, impure_patterns, pure_impure, cs, cell, sgs, hkls <span class="op">=</span> calcdata</span>
-<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>        pred_pure, pred_peaks <span class="op">=</span> model(combined.unsqueeze(<span class="dv">1</span>))</span>
-<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>        impurepeaks <span class="op">=</span> ((impure_patterns <span class="op">-</span> pure_patterns) <span class="op">&gt;</span> impure_peak_threshold).<span class="bu">type</span>(dtype)</span>
-<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>        pure_impure_bce <span class="op">=</span> F.binary_cross_entropy_with_logits(pred_pure.squeeze(), pure_impure)</span>
-<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>        pred_peaks_bce <span class="op">=</span> F.binary_cross_entropy_with_logits(pred_peaks.squeeze(), impurepeaks)</span>
-<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>        <span class="co"># precision, recall, f1, accuracy, mcc</span></span>
-<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>        p_i_stats <span class="op">=</span> get_stats(pred_pure.squeeze(), pure_impure)</span>
-<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>        patch_stats <span class="op">=</span> get_stats(pred_peaks.squeeze(), impurepeaks)</span>
-<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> train:</span>
-<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>            loss <span class="op">=</span> pure_impure_bce <span class="op">+</span> pred_peaks_bce</span>
-<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>            loss.backward()</span>
-<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>            nn.utils.clip_grad_norm_(model.parameters(), <span class="fl">1.0</span>)</span>
-<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>            optimizer.step()</span>
-<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> show_pbar:</span>
-<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a>            pbar.set_description_str(<span class="ss">f"Epoch: </span><span class="sc">{</span>epoch<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> Loss: </span><span class="sc">{</span>loss<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> P/I Prec </span><span class="sc">{</span>p_i_stats[<span class="dv">0</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> P/I Rec </span><span class="sc">{</span>p_i_stats[<span class="dv">1</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> Patch Prec </span><span class="sc">{</span>patch_stats[<span class="dv">0</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> Patch Rec </span><span class="sc">{</span>patch_stats[<span class="dv">1</span>]<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a>        logs.append(torch.tensor([p_i_stats <span class="op">+</span> patch_stats]))</span>
-<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> train:</span>
-<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> plot:</span>
-<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
-<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>                plt.plot(combined[i].cpu())</span>
-<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>                plt.plot(<span class="op">-</span><span class="dv">1</span><span class="op">*</span>impure_patterns[i].cpu()<span class="op">-</span><span class="fl">0.05</span>)</span>
-<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>                plt.plot(impurepeaks[i].cpu())</span>
-<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>                plt.plot(F.sigmoid(pred_peaks[i]).detach().cpu())</span>
-<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>                plt.title(<span class="ss">f"</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>F<span class="sc">.</span>sigmoid(pred_pure[i])<span class="sc">.</span>detach()<span class="sc">.</span>item()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a>                plt.show()</span>
-<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>        model.train()</span>
-<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> logs</span>
-<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell" data-execution_count="13">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>batchsize <span class="op">=</span> (<span class="dv">128</span><span class="op">*</span><span class="dv">3</span>)<span class="op">//</span><span class="dv">2</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">3e-4</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>impure_peak_threshold <span class="op">=</span> <span class="fl">2.5e-3</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> <span class="va">None</span> <span class="co"># Train on all data, not a subset</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>show_pbar <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ConvNeXtTransformer(depths<span class="op">=</span>[<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>,<span class="dv">2</span>],</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                            dims<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">12</span>,<span class="dv">16</span>],</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                            transformer_layers<span class="op">=</span><span class="dv">6</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                            transformer_heads<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                            drop_path_prob<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                            dropout<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                        ).to(device)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model parameters:"</span>,<span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters() <span class="cf">if</span> p.requires_grad))</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.AdamW(params<span class="op">=</span>model.parameters(), lr<span class="op">=</span>learning_rate, betas<span class="op">=</span>(<span class="fl">0.9</span>, <span class="fl">0.99</span>), weight_decay<span class="op">=</span><span class="fl">0.01</span>)</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> DiffractionData(base_name, root_dir<span class="op">=</span>root_dir, idx<span class="op">=</span>idx)</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> torch.Generator().manual_seed(<span class="dv">42</span>)</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>train_set, val_set <span class="op">=</span> torch.utils.data.random_split(dataset, [<span class="fl">0.8</span>, <span class="fl">0.2</span>], g)</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>train_dataloader <span class="op">=</span> DataLoader(train_set, batch_size<span class="op">=</span>batchsize, shuffle<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>val_dataloader   <span class="op">=</span> DataLoader(val_set,   batch_size<span class="op">=</span>batchsize, shuffle<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Training samples = </span><span class="sc">{</span><span class="bu">len</span>(train_set)<span class="sc">}</span><span class="ch">\n</span><span class="ss">Validation samples = </span><span class="sc">{</span><span class="bu">len</span>(val_set)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>batchsize <span class="op">=</span> (<span class="dv">128</span><span class="op">*</span><span class="dv">3</span>)<span class="op">//</span><span class="dv">2</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> DiffractionData(base_name, root_dir<span class="op">=</span>root_dir)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> torch.Generator().manual_seed(<span class="dv">42</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>train_set, val_set <span class="op">=</span> torch.utils.data.random_split(dataset, [<span class="fl">0.8</span>, <span class="fl">0.2</span>], g)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>train_dataloader <span class="op">=</span> DataLoader(train_set, batch_size<span class="op">=</span>batchsize, shuffle<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>val_dataloader   <span class="op">=</span> DataLoader(val_set,   batch_size<span class="op">=</span>batchsize, shuffle<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Training samples = </span><span class="sc">{</span><span class="bu">len</span>(train_set)<span class="sc">}</span><span class="ch">\n</span><span class="ss">Validation samples = </span><span class="sc">{</span><span class="bu">len</span>(val_set)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Model parameters: 57341
-Training samples = 230499
+<pre><code>Training samples = 230499
 Validation samples = 57624</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="14">
+<p>Now let’s initialise the the model and optimizer. Rather than do extensive hyperparameter optimisation, I’ve just taken the hyperparameters for the optimiser used by <a href="https://twitter.com/karpathy">Andrej Karpathy</a> for his excellent nanoGPT model, which can be found <a href="https://github.com/karpathy/nanoGPT/blob/master/train.py">here</a>.</p>
+<div class="cell" data-execution_count="9">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>num_steps <span class="op">=</span> (<span class="bu">len</span>(train_set)<span class="op">//</span>batchsize) <span class="op">*</span> num_epochs</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Epochs: </span><span class="sc">{</span>num_epochs<span class="sc">}</span><span class="ss"> Total gradient updates: </span><span class="sc">{</span>num_steps<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>all_train_losses <span class="op">=</span> []</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>all_val_losses <span class="op">=</span> []</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>best_val_mape <span class="op">=</span> <span class="bu">float</span>(<span class="st">"inf"</span>)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    train_losses <span class="op">=</span> get_loss(train_dataloader, model, optimizer, epoch, train<span class="op">=</span><span class="va">True</span>, show_pbar<span class="op">=</span>show_pbar, impure_peak_threshold<span class="op">=</span>impure_peak_threshold)</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    all_train_losses.append(train_losses)</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    train_losses <span class="op">=</span> torch.cat(train_losses, dim<span class="op">=</span><span class="dv">0</span>).mean(dim<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    val_losses <span class="op">=</span> get_loss(val_dataloader, model, optimizer, epoch, train<span class="op">=</span><span class="va">False</span>, show_pbar<span class="op">=</span>show_pbar, impure_peak_threshold<span class="op">=</span>impure_peak_threshold)</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    all_val_losses.append(val_losses)</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    val_losses <span class="op">=</span> torch.cat(val_losses, dim<span class="op">=</span><span class="dv">0</span>).mean(dim<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_pbar:</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print(f"Train: MSE {train_losses[0]:.3f} MAE {train_losses[1]:.3f} MAPE {train_losses[2]:.3f} Huber {train_losses[3]:.3f}")</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print(f"  Val: MSE {val_losses[0]:.3f} MAE {val_losses[1]:.3f} MAPE {val_losses[2]:.3f} Huber {val_losses[3]:.3f}")</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">#if val_losses[2] &lt; best_val_mape:</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    #best_val_mape = val_losses[2]</span></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    #torch.save({</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    #    'epoch': epoch,</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    #    'model_state_dict': model.state_dict(),</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    #    'optimizer_state_dict': optimizer.state_dict(),</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    #    }, f"saved_models/{name}.pth")</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    pass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">6e-4</span> <span class="co"># max learning rate</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>max_iters <span class="op">=</span> (<span class="bu">len</span>(train_set)<span class="op">//</span>batchsize) <span class="op">*</span> num_epochs</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Epochs: </span><span class="sc">{</span>num_epochs<span class="sc">}</span><span class="ss"> Total gradient updates: </span><span class="sc">{</span>max_iters<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>weight_decay <span class="op">=</span> <span class="fl">1e-1</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>beta1 <span class="op">=</span> <span class="fl">0.9</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>beta2 <span class="op">=</span> <span class="fl">0.95</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>grad_clip <span class="op">=</span> <span class="fl">1.0</span> <span class="co"># clip gradients at this value</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>decay_lr <span class="op">=</span> <span class="va">True</span> <span class="co"># whether to decay the learning rate</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>warmup_iters <span class="op">=</span> <span class="dv">2000</span> <span class="co"># how many steps to warm up for</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>lr_decay_iters <span class="op">=</span> max_iters</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>min_lr <span class="op">=</span> <span class="fl">6e-5</span> <span class="co"># minimum learning rate, should be ~= learning_rate/10</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>impure_peak_threshold <span class="op">=</span> <span class="fl">5e-3</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ConvNeXtTransformer(depths<span class="op">=</span>[<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>,<span class="dv">2</span>],</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                            dims<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">16</span>,<span class="dv">32</span>],</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                            transformer_layers<span class="op">=</span><span class="dv">8</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                            attention_heads<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                            drop_path_prob<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                            dropout<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                        ).to(device)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model parameters:"</span>,<span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters() <span class="cf">if</span> p.requires_grad))</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.AdamW(params<span class="op">=</span>model.parameters(), lr<span class="op">=</span>learning_rate, betas<span class="op">=</span>(beta1, beta2), weight_decay<span class="op">=</span>weight_decay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Epochs: 50 Total gradient updates: 60000</code></pre>
+<pre><code>Epochs: 50 Total gradient updates: 60000
+Model parameters: 146257</code></pre>
+</div>
+</div>
+<p>Let’s set this thing training!</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>show_pbar <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>all_train_metrics <span class="op">=</span> []</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>all_val_metrics <span class="op">=</span> []</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>best_val_mape <span class="op">=</span> <span class="bu">float</span>(<span class="st">"inf"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>iter_num <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    iter_num, train_metrics <span class="op">=</span> get_loss(iter_num, train_dataloader, model, optimizer, epoch, train<span class="op">=</span><span class="va">True</span>, show_pbar<span class="op">=</span>show_pbar, impure_peak_threshold<span class="op">=</span>impure_peak_threshold)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    all_train_metrics.append(train_metrics)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    train_metrics <span class="op">=</span> torch.cat(train_metrics, dim<span class="op">=</span><span class="dv">0</span>).mean(dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    _, val_metrics <span class="op">=</span> get_loss(iter_num, val_dataloader, model, optimizer, epoch, train<span class="op">=</span><span class="va">False</span>, show_pbar<span class="op">=</span>show_pbar, impure_peak_threshold<span class="op">=</span>impure_peak_threshold, plot<span class="op">=</span>show_pbar)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    all_val_metrics.append(val_metrics)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    val_metrics <span class="op">=</span> torch.cat(val_metrics, dim<span class="op">=</span><span class="dv">0</span>).mean(dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_pbar:</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Best Val Pure / Impure classification:"</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Precision: </span><span class="sc">{</span>val_metrics[<span class="dv">0</span>]<span class="sc">:.3f}</span><span class="ss"> Recall: </span><span class="sc">{</span>val_metrics[<span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss"> F1: </span><span class="sc">{</span>val_metrics[<span class="dv">2</span>]<span class="sc">:.3f}</span><span class="ss"> Accuracy: </span><span class="sc">{</span>val_metrics[<span class="dv">3</span>]<span class="sc">:.3f}</span><span class="ss"> MCC </span><span class="sc">{</span>val_metrics[<span class="dv">4</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Best Val - Peak level classification:"</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Precision: </span><span class="sc">{</span>val_metrics[<span class="dv">5</span>]<span class="sc">:.3f}</span><span class="ss"> Recall: </span><span class="sc">{</span>val_metrics[<span class="dv">6</span>]<span class="sc">:.3f}</span><span class="ss"> F1: </span><span class="sc">{</span>val_metrics[<span class="dv">7</span>]<span class="sc">:.3f}</span><span class="ss"> Accuracy: </span><span class="sc">{</span>val_metrics[<span class="dv">8</span>]<span class="sc">:.3f}</span><span class="ss"> MCC </span><span class="sc">{</span>val_metrics[<span class="dv">9</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the model</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>torch.save({<span class="st">'epoch'</span>: epoch,</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">'model_state_dict'</span>: model.state_dict(),</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">'optimizer_state_dict'</span>: optimizer.state_dict(),</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>        }, <span class="st">"saved_models/Impurity_detection_ConvNeXt_Transformer.pth"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The model took about 3 hours to train on my RTX 2060 GPU, with a modest batch size and 60k gradient updates. Let’s plot the model performance over time, and see how well it performed in terms of some commonly used metrics for binary classification tasks: - <a href="https://en.wikipedia.org/wiki/Precision_and_recall">Precision and Recall</a> - <a href="https://en.wikipedia.org/wiki/F-score">F1 (harmonic mean of Precision and Recall)</a> - <a href="https://en.wikipedia.org/wiki/Accuracy_and_precision#In_binary_classification">Accuracy</a> - <a href="https://en.wikipedia.org/wiki/Phi_coefficient">Matthews Correlation Coefficient (MCC)</a></p>
+<div class="cell" data-execution_count="38">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the average loss for each epoch and plot</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>train_av <span class="op">=</span> torch.cat([x.mean(dim<span class="op">=</span><span class="dv">0</span>,keepdim<span class="op">=</span><span class="va">True</span>) <span class="cf">for</span> x <span class="kw">in</span> [torch.cat(y, dim<span class="op">=</span><span class="dv">0</span>) <span class="cf">for</span> y <span class="kw">in</span> all_train_metrics]], dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>val_av <span class="op">=</span> torch.cat([x.mean(dim<span class="op">=</span><span class="dv">0</span>,keepdim<span class="op">=</span><span class="va">True</span>) <span class="cf">for</span> x <span class="kw">in</span> [torch.cat(y, dim<span class="op">=</span><span class="dv">0</span>) <span class="cf">for</span> y <span class="kw">in</span> all_val_metrics]], dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, info <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">"Pure / Impure classification"</span>, <span class="st">"Peak-level classification"</span>]):</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(ncols<span class="op">=</span><span class="dv">5</span>, nrows<span class="op">=</span><span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">17</span>,<span class="fl">3.5</span>))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    fig.suptitle(info)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j, metric <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">"Precision"</span>, <span class="st">"Recall"</span>, <span class="st">"F1"</span>, <span class="st">"Accuracy"</span>, <span class="st">"MCC"</span>]):</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        ax[j].plot(train_av[:,i<span class="op">*</span><span class="dv">5</span><span class="op">+</span>j])</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        ax[j].plot(val_av[:,i<span class="op">*</span><span class="dv">5</span><span class="op">+</span>j])</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        ax[j].set_title(metric)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">==</span> <span class="dv">2</span>:</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            ax[j].set_xlabel(<span class="st">"Epoch"</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    ax[j].legend([<span class="st">"Train"</span>,<span class="st">"Val"</span>])</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>val_av_max <span class="op">=</span> val_av.<span class="bu">max</span>(dim<span class="op">=</span><span class="dv">0</span>).values</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best Val Pure / Impure classification:"</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Precision: </span><span class="sc">{</span>val_av_max[<span class="dv">0</span>]<span class="sc">:.3f}</span><span class="ss"> Recall: </span><span class="sc">{</span>val_av_max[<span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss"> F1: </span><span class="sc">{</span>val_av_max[<span class="dv">2</span>]<span class="sc">:.3f}</span><span class="ss"> Accuracy: </span><span class="sc">{</span>val_av_max[<span class="dv">3</span>]<span class="sc">:.3f}</span><span class="ss"> MCC </span><span class="sc">{</span>val_av_max[<span class="dv">4</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Best Val Peak-level classification:"</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Precision: </span><span class="sc">{</span>val_av_max[<span class="dv">5</span>]<span class="sc">:.3f}</span><span class="ss"> Recall: </span><span class="sc">{</span>val_av_max[<span class="dv">6</span>]<span class="sc">:.3f}</span><span class="ss"> F1: </span><span class="sc">{</span>val_av_max[<span class="dv">7</span>]<span class="sc">:.3f}</span><span class="ss"> Accuracy: </span><span class="sc">{</span>val_av_max[<span class="dv">8</span>]<span class="sc">:.3f}</span><span class="ss"> MCC </span><span class="sc">{</span>val_av_max[<span class="dv">9</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="2024-02-17-Detecting-impurities-in-PXRD-data_files/figure-html/cell-11-output-1.png" class="quarto-discovered-preview-image img-fluid"></p>
 </div>
 <div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"a4a251419d224cab91b89ecb72f54074","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
+<p><img src="2024-02-17-Detecting-impurities-in-PXRD-data_files/figure-html/cell-11-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best Val Pure / Impure classification:
+  Precision: 0.943 Recall: 0.890 F1: 0.892 Accuracy: 0.895 MCC 0.794
+
+Best Val Peak-level classification:
+  Precision: 0.774 Recall: 0.408 F1: 0.511 Accuracy: 0.982 MCC 0.522</code></pre>
 </div>
 </div>
+<p>Unsurprisingly, the performance of the model on the pure vs impure classification task is generally higher than that of the peak level classification task, where the model is trying to determine <em>which peaks</em> in the data come from the minority phase. This is most clearly seen in the case of the recall, where the model is only able to catch about 40 % of the impurity phase peaks. However, we still see pretty good performance on this challenging task with a very small model!</p>
+<p>The accuracy for the peak-level classification task is somewhat misleading. This is readily explained by the fact that the data are very imbalanced for this task, the vast majority of points on the PXRD histogram not being associated with any impurity phase peaks.</p>
+<p>Let’s now take a look at the information the model gives us, and check that the performance implied by these metrics is actually borne out in practice, and more importantly, if this model will actually be useful in the real world when trying to index a PXRD dataset.</p>
+<div class="cell" data-execution_count="43">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_plots(dataloader, model, impure_peak_threshold<span class="op">=</span><span class="fl">5e-3</span>, number_of_plots<span class="op">=</span><span class="dv">5</span>):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Get the losses for an epoch. Toggle between the dataloaders so the same code can be recycled</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">    for the training and validation sets.</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch_cs, batch_hkl, batch_i, batch_cell, batch_sg_number <span class="kw">in</span> dataloader:</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(batch_cs) <span class="op">%</span> <span class="dv">2</span> <span class="op">!=</span> <span class="dv">0</span> <span class="kw">or</span> <span class="bu">len</span>(batch_cs) <span class="op">%</span> <span class="dv">3</span> <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>            maxlength <span class="op">=</span> <span class="dv">6</span><span class="op">*</span>(batch_cs.shape[<span class="dv">0</span>]<span class="op">//</span><span class="dv">6</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>            batch_cs <span class="op">=</span> batch_cs[:maxlength]</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>            batch_hkl <span class="op">=</span> batch_hkl[:maxlength]</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>            batch_i <span class="op">=</span> batch_i[:maxlength]</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>            batch_cell <span class="op">=</span> batch_cell[:maxlength]</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>            batch_sg_number <span class="op">=</span> batch_sg_number[:maxlength]</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        calcdata <span class="op">=</span> patterns.calculate_diffraction_patterns_with_impurities(</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                                        x,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>                                        full_data,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                                        batch_cs.to(device),</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>                                        batch_hkl.to(device),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>                                        batch_i.to(device),</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>                                        batch_cell.to(device),</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>                                        batch_sg_number.to(device),</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>                                        same_hwhm<span class="op">=</span>same_hwhm,</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>                                        min_impurity_intensity<span class="op">=</span>min_impurity_intensity,</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>                                        max_impurity_intensity<span class="op">=</span>max_impurity_intensity,</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>                                        add_background <span class="op">=</span> add_background,</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>                                    )</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>        combined, pure_patterns, impure_patterns, pure_impure, cs, cell, sgs, hkls <span class="op">=</span> calcdata</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>        pred_pure, pred_peaks <span class="op">=</span> model(combined.unsqueeze(<span class="dv">1</span>))</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>        impurepeaks <span class="op">=</span> ((impure_patterns <span class="op">-</span> pure_patterns) <span class="op">&gt;</span> impure_peak_threshold).<span class="bu">type</span>(dtype)</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(number_of_plots):</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>            plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">4</span>))</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>            plt.plot([<span class="dv">4</span>, <span class="dv">44</span>],[<span class="fl">0.5</span>,<span class="fl">0.5</span>], c<span class="op">=</span><span class="st">"k"</span>, alpha<span class="op">=</span><span class="fl">0.15</span>)</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>            plt.plot(plotdata, combined[i].cpu())</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>            plt.plot(plotdata, <span class="op">-</span><span class="dv">1</span><span class="op">*</span>impure_patterns[i].cpu())</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>            plt.plot(plotdata, F.sigmoid(pred_peaks[i]).detach().cpu(), alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>            plt.plot(plotdata, impurepeaks[i].cpu(), alpha<span class="op">=</span><span class="fl">0.2</span>, c<span class="op">=</span><span class="st">"k"</span>)</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>            plt.xlabel(<span class="st">"$2</span><span class="ch">\\</span><span class="st">theta$"</span>)</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>            plt.title(<span class="ss">f"Probability of impure data: </span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>F<span class="sc">.</span>sigmoid(pred_pure[i])<span class="sc">.</span>detach()<span class="sc">.</span>item()<span class="sc">:.2f}</span><span class="ss"> %"</span>)</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>            plt.xlim([<span class="dv">4</span>, <span class="dv">44</span>])</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>            plt.show()</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>get_plots(val_dataloader, model, number_of_plots<span class="op">=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="2024-02-17-Detecting-impurities-in-PXRD-data_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2024-02-17-Detecting-impurities-in-PXRD-data_files/figure-html/cell-12-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2024-02-17-Detecting-impurities-in-PXRD-data_files/figure-html/cell-12-output-3.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2024-02-17-Detecting-impurities-in-PXRD-data_files/figure-html/cell-12-output-4.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2024-02-17-Detecting-impurities-in-PXRD-data_files/figure-html/cell-12-output-5.png" class="img-fluid"></p>
+</div>
+</div>
+<p>There’s quite a lot going on in these plots, so let’s break down what they show: 1. The title of the plot indicates the results of the binary pure / impure task. Anything over 50 % is considered to be a positive identification of a multi-phase dataset. The higher the number, the greater the probability assigned by the model. 2. The grey line at y=0.5 is just there to give a visual indication of when the model is predicting that a given peak comes from an impurity phase. Anything below this threshold is not considered a positive identification (though may still be of interest!) 3. The blue line is the data that was fed into the model - this is synthetic data, which may or may not contain peaks from multiple phases 4. The orange line is the ground-truth intensities for any impurity phase present in the data, reflected by the x-axis. This allows us to see if the input data did indeed contain impurities, and if so, where the peaks from the impurity phase should be most prominent. 5. The green line is the model’s prediction, for each point in the histogram, for if the intensity at this point can be mostly attributed to an impurity phase (after correcting for background scattering etc) 6. The pale grey lines are the ground-truth labels that the model was trained to predict. In an ideal case, the green line should completely overlap with these grey lines.</p>
+<p>As we can see from the plots, the model does pretty well! In each of the examples plotted above, it correctly determined if the data came from a single phase or multiple phases. In terms of the peak-level classification task, we can see that the model, where impurity peaks are present, does pretty well at picking up peaks early in the data, but less well further on in the pattern. This isn’t too surprising due to several factors, such as the atomic form-factor fall off leading to lower intensities and the greater density of peaks leading to increased likelihood of peak overlap.</p>
+<p>All in all, this looks like it could provide some useful information to end users if they are struggling to index a PXRD dataset. One possible cause of a failure to index the data could be the present of impurity peaks. If these can be eliminated from the indexing attempt, then it may become possible to index the data!</p>
+</section>
+<section id="web-app" class="level1">
+<h1>Web-App</h1>
+<p>I’ve made the model weights available <a href="https://github.com/mspillman/impurities">here</a>. However, not everyone will want to run a python script every time they want to check a dataset, so I thought I’d also write a simple web-app and make it freely available and accessible to users.</p>
+<p>The web-app can be found <a href="https://impuritydetector.streamlit.app/">here</a>, and it’s operation is described below.</p>
+<section id="how-it-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-it-works">How it works</h2>
+<p>The model was trained on data designed to approximate patterns collected on laboratory-based instruments using Cu Ka1 radiation, with a step size of 0.019 degrees and a range of 4 - 44 degrees <span class="math inline">\(2\theta\)</span>. Any data that does not meet these parameters clearly will need modification before it can be used by the model.</p>
+<p>Any data collected with a different wavelength and/or step size will automatically be converted to the expected pattern for CuKa1 with the correct step size via interpolation. Any data below or above the expected range is trimmed. If the data range starts <em>after</em> 4 degrees <span class="math inline">\(2\theta\)</span>, then the first datapoint is used to fill in the blanks. This is an augmentation that was included in the data-generation code, and as such, the model should correctly ignore this.</p>
+<p>Once the diffraction data is in the correct format for the model, the model is used to determine: 1. The probability that the pattern was produced by a single or multiple crystalline phases. The prediction is printed above the plot 2. An interactive plot showing the diffraction data, overlaid with the probability assigned by the model to each point on the histogram that the intensity (after accounting for the background) can be accounted for by an impurity phase.</p>
+<p>Let’s see if the web-app may actually be useful for end users. In <a href="https://pubs.rsc.org/en/content/articlelanding/2011/ce/c1ce05650f">this publication</a>, we reported the crystal structure of a co-crystal that was produced by grinding carbamazepine and indomethacin together. The structure was solved from PXRD data, relatively easily. However, the hardest part of the solution process was actually indexing the data - this was due to the presence of left-over carbamazepine and indomethacin within the polycrystalline sample that resulted.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/CBZ-IND.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Majumder et al, 2011</figcaption><p></p>
+</figure>
+</div>
+<p>Below is a screenshot showing the output of the model on the experimental data we collected on the cocrystal.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/impurity-web-app-screenshot.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Web-app example output</figcaption><p></p>
+</figure>
+</div>
+<p>As we can see, the model correctly predicts that the data contains peaks from multiple phases, with a high degree of confidence. Let’s zoom in on the data and see which peaks are predicted to come from the impurities:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/cbz-ind-web-app-zoom.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Web app zoomed in</figcaption><p></p>
+</figure>
+</div>
+<p>Anything over 0.5 is a positive prediction, so it looks like the peaks at ca. 10.2, 11.6, 13.1 and 17.2 should be treated as impurity peaks. There are several other peaks, which the model finds suspicious, though that don’t meet the 0.5 probability threshold. Let’s take a look at anything for which the model gives &gt;0.3 probability of being an impurity peak as “suspicious”, and check the results in the table below:</p>
+<table class="table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 29%">
+<col style="width: 22%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Peak <span class="math inline">\(2\theta\)</span> position / <span class="math inline">\(^{o}\)</span></th>
+<th>Probability of impurity</th>
+<th>Is impurity line?</th>
+<th>Model correct?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>9.0</td>
+<td>0.39</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr class="even">
+<td>9.5</td>
+<td>0.31</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr class="odd">
+<td>10.2</td>
+<td>0.53</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="even">
+<td>11.6</td>
+<td>0.57</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="odd">
+<td>12.1</td>
+<td>0.47</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr class="even">
+<td>13.1</td>
+<td>0.64</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="odd">
+<td>15.3</td>
+<td>0.45</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr class="even">
+<td>16.7</td>
+<td>0.38</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr class="odd">
+<td>17.1</td>
+<td>0.40</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr class="even">
+<td>17.3</td>
+<td>0.54</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="odd">
+<td>21.0</td>
+<td>0.47</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr class="even">
+<td>22.4</td>
+<td>0.31</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p>I mark the model as being correct if the line is an impurity line, and it assigns &gt; 0.5 probability, or the line is not an impurity line and it assigns &lt; 0.5 probability. Otherwise, it is marked as being incorrect.</p>
+<p>As we can see from the results, the model gets the majority of the assignments correct which is great! It also gives a bit of a “jumping off” point for the end user to look more closely at particular lines in the data, which may help to identify the impurities.</p>
+<p>As part of the solution process for the paper I linked above, we ended up using TOPAS to extract the “pure phase” data for the cocrystal. If I pass this data through the model, we can clearly see that the model correctly recognizes that the data are pure and there aren’t any suspicious peaks!</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/pure-coxtal.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Pure cocrystal phase data</figcaption><p></p>
+</figure>
+</div>
+</section>
+</section>
+<section id="conclusions" class="level1">
+<h1>Conclusions</h1>
+<p>In this post, we’ve developed a hybrid convolutional transformer model that can relatively reliably detect multi-phase PXRD data. This may be of interest to crystallographers who have patterns that are proving challenging to index!</p>
+<p>The web-app described in the latter part of the post is freely available here - <a href="https://impuritydetector.streamlit.app/">https://impuritydetector.streamlit.app/</a></p>
+<p>The code for the web app and the pre-trained model is available here - <a href="https://github.com/mspillman/impurities">https://github.com/mspillman/impurities</a></p>
 
 
 </section>
